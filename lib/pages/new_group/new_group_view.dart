@@ -35,23 +35,23 @@ class NewGroupView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SegmentedButton<CreateGroupType>(
-                selected: {controller.createGroupType},
-                onSelectionChanged: controller.setCreateGroupType,
-                segments: [
-                  ButtonSegment(
-                    value: CreateGroupType.group,
-                    label: Text(L10n.of(context).group),
-                  ),
-                  ButtonSegment(
-                    value: CreateGroupType.space,
-                    label: Text(L10n.of(context).space),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(16.0),
+            //   child: SegmentedButton<CreateGroupType>(
+            //     selected: {controller.createGroupType},
+            //     onSelectionChanged: controller.setCreateGroupType,
+            //     segments: [
+            //       ButtonSegment(
+            //         value: CreateGroupType.group,
+            //         label: Text(L10n.of(context).group),
+            //       ),
+            //       ButtonSegment(
+            //         value: CreateGroupType.space,
+            //         label: Text(L10n.of(context).space),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 16),
             InkWell(
               borderRadius: BorderRadius.circular(90),
@@ -88,62 +88,61 @@ class NewGroupView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            SwitchListTile.adaptive(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-              secondary: const Icon(Icons.public_outlined),
-              title: Text(
-                controller.createGroupType == CreateGroupType.space
-                    ? L10n.of(context).spaceIsPublic
-                    : L10n.of(context).groupIsPublic,
-              ),
-              value: controller.publicGroup,
-              onChanged: controller.loading ? null : controller.setPublicGroup,
-            ),
-            AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
-              child: controller.publicGroup
-                  ? SwitchListTile.adaptive(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 32),
-                      secondary: const Icon(Icons.search_outlined),
-                      title: Text(L10n.of(context).groupCanBeFoundViaSearch),
-                      value: controller.groupCanBeFound,
-                      onChanged: controller.loading
-                          ? null
-                          : controller.setGroupCanBeFound,
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            AnimatedSize(
-              duration: FluffyThemes.animationDuration,
-              curve: FluffyThemes.animationCurve,
-              child: controller.createGroupType == CreateGroupType.space
-                  ? const SizedBox.shrink()
-                  : SwitchListTile.adaptive(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 32),
-                      secondary: Icon(
-                        Icons.lock_outlined,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      title: Text(
-                        L10n.of(context).enableEncryption,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                      value: !controller.publicGroup,
-                      onChanged: null,
-                    ),
-            ),
+            // SwitchListTile.adaptive(
+            //   contentPadding: const EdgeInsets.symmetric(horizontal: 32),
+            //   secondary: const Icon(Icons.public_outlined),
+            //   title: Text(
+            //     controller.createGroupType == CreateGroupType.space
+            //         ? L10n.of(context).spaceIsPublic
+            //         : L10n.of(context).groupIsPublic,
+            //   ),
+            //   value: controller.publicGroup,
+            //   onChanged: controller.loading ? null : controller.setPublicGroup,
+            // ),
+            // AnimatedSize(
+            //   duration: FluffyThemes.animationDuration,
+            //   curve: FluffyThemes.animationCurve,
+            //   child: controller.publicGroup
+            //       ? SwitchListTile.adaptive(
+            //           contentPadding:
+            //               const EdgeInsets.symmetric(horizontal: 32),
+            //           secondary: const Icon(Icons.search_outlined),
+            //           title: Text(L10n.of(context).groupCanBeFoundViaSearch),
+            //           value: controller.groupCanBeFound,
+            //           onChanged: controller.loading
+            //               ? null
+            //               : controller.setGroupCanBeFound,
+            //         )
+            //       : const SizedBox.shrink(),
+            // ),
+            // AnimatedSize(
+            //   duration: FluffyThemes.animationDuration,
+            //   curve: FluffyThemes.animationCurve,
+            //   child: controller.createGroupType == CreateGroupType.space
+            //       ? const SizedBox.shrink()
+            //       : SwitchListTile.adaptive(
+            //           contentPadding:
+            //               const EdgeInsets.symmetric(horizontal: 32),
+            //           secondary: Icon(
+            //             Icons.lock_outlined,
+            //             color: theme.colorScheme.onSurface,
+            //           ),
+            //           title: Text(
+            //             L10n.of(context).enableEncryption,
+            //             style: TextStyle(
+            //               color: theme.colorScheme.onSurface,
+            //             ),
+            //           ),
+            //           value: !controller.publicGroup,
+            //           onChanged: null,
+            //         ),
+            // ),
             AnimatedSize(
               duration: FluffyThemes.animationDuration,
               curve: FluffyThemes.animationCurve,
               child: controller.createGroupType == CreateGroupType.space
                   ? ListTile(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 32),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 32),
                       trailing: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Icon(Icons.info_outlined),
@@ -157,8 +156,7 @@ class NewGroupView extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed:
-                      controller.loading ? null : controller.submitAction,
+                  onPressed: controller.loading ? null : controller.submitAction,
                   child: controller.loading
                       ? const LinearProgressIndicator()
                       : Text(

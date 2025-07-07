@@ -1,3 +1,7 @@
+import 'dart:ui_web' as ui_web;
+
+import 'package:fluffychat/utils/initdata_js_type.dart';
+import 'package:fluffychat/widgets/multi_view_app.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -30,8 +34,7 @@ void main() async {
   // If the app starts in detached mode, we assume that it is in
   // background fetch mode for processing push notifications. This is
   // currently only supported on Android.
-  if (PlatformInfos.isAndroid &&
-      AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
+  if (PlatformInfos.isAndroid && AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
     // Do not send online presences when app is in background fetch mode.
     for (final client in clients) {
       client.backgroundSync = false;
@@ -62,8 +65,7 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   String? pin;
   if (PlatformInfos.isMobile) {
     try {
-      pin =
-          await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
+      pin = await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
     } catch (e, s) {
       Logs().d('Unable to read PIN from Secure storage', e, s);
     }
@@ -74,7 +76,32 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   await firstClient?.roomsLoading;
   await firstClient?.accountDataLoading;
 
-  runApp(FluffyChatApp(clients: clients, pincode: pin, store: store));
+  // runApp(FluffyChatApp(clients: clients, pincode: pin, store: store));
+  runWidget(
+    MultiViewApp(
+      viewBuilder: (BuildContext context) {
+        final int viewId = View.of(context).viewId;
+        final initialData = ui_web.views.getInitialData(viewId) as InitialData?;
+        if (initialData != null) {
+          AppConfig.setUsername(initialData.username);
+          AppConfig.setPassword(initialData.password);
+          AppConfig.setHomeserver(initialData.homeserver_url);
+        }
+
+        // AppConfig.setUsername('@fos_employee_210:localhost:8008');
+        // AppConfig.setPassword('231199@Huyson');
+        // AppConfig.setUsername('@fos_employee_55:localhost:8008');
+        // AppConfig.setPassword('111111');
+        // AppConfig.setHomeserver('http://localhost:8008');
+
+        return FluffyChatApp(
+          clients: clients,
+          pincode: pin,
+          store: store,
+        );
+      },
+    ),
+  );
 }
 
 /// Watches the lifecycle changes to start the application when it

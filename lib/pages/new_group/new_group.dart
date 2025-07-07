@@ -66,8 +66,9 @@ class NewGroupController extends State<NewGroup> {
   Future<void> _createGroup() async {
     if (!mounted) return;
     final roomId = await Matrix.of(context).client.createGroupChat(
-      visibility:
-          groupCanBeFound ? sdk.Visibility.public : sdk.Visibility.private,
+      // Beta - Create a group defaults to public, so we need to set the visibility
+      enableEncryption: false,
+      visibility: groupCanBeFound ? sdk.Visibility.public : sdk.Visibility.private,
       preset: publicGroup
           ? sdk.CreateRoomPreset.publicChat
           : sdk.CreateRoomPreset.privateChat,

@@ -3,26 +3,24 @@ import 'dart:ui';
 import 'package:matrix/matrix.dart';
 
 abstract class AppConfig {
-  static String _applicationName = 'FluffyChat';
+  static String _applicationName = 'fChat';
 
   static String get applicationName => _applicationName;
   static String? _applicationWelcomeMessage;
 
   static String? get applicationWelcomeMessage => _applicationWelcomeMessage;
-  static String _defaultHomeserver = 'matrix.org';
 
-  static String get defaultHomeserver => _defaultHomeserver;
+  static String? defaultHomeserver;
   static double fontSizeFactor = 1;
   static const Color chatColor = primaryColor;
   static Color? colorSchemeSeed = primaryColor;
   static const double messageFontSize = 16.0;
   static const bool allowOtherHomeservers = true;
   static const bool enableRegistration = true;
-  static const Color primaryColor = Color(0xFF5625BA);
+  static const Color primaryColor = Color(0xFF00AEEF);
   static const Color primaryColorLight = Color(0xFFCCBDEA);
   static const Color secondaryColor = Color(0xFF41a2bc);
-  static String _privacyUrl =
-      'https://github.com/krille-chan/fluffychat/blob/main/PRIVACY.md';
+  static String _privacyUrl = 'https://github.com/krille-chan/fluffychat/blob/main/PRIVACY.md';
 
   static const Set<String> defaultReactions = {'👍', '❤️', '😂', '😮', '😢'};
 
@@ -39,12 +37,9 @@ abstract class AppConfig {
   static String _webBaseUrl = 'https://fluffychat.im/web';
 
   static String get webBaseUrl => _webBaseUrl;
-  static const String sourceCodeUrl =
-      'https://github.com/krille-chan/fluffychat';
-  static const String supportUrl =
-      'https://github.com/krille-chan/fluffychat/issues';
-  static const String changelogUrl =
-      'https://github.com/krille-chan/fluffychat/blob/main/CHANGELOG.md';
+  static const String sourceCodeUrl = 'https://github.com/krille-chan/fluffychat';
+  static const String supportUrl = 'https://github.com/krille-chan/fluffychat/issues';
+  static const String changelogUrl = 'https://github.com/krille-chan/fluffychat/blob/main/CHANGELOG.md';
   static final Uri newIssueUrl = Uri(
     scheme: 'https',
     host: 'github.com',
@@ -76,6 +71,21 @@ abstract class AppConfig {
     path: 'servers.json',
   );
 
+  static String? username;
+  static String? password;
+
+  static setUsername(String? value) {
+    username = value;
+  }
+
+  static setPassword(String? value) {
+    password = value;
+  }
+
+  static setHomeserver(String? value) {
+    defaultHomeserver = value;
+  }
+
   static void loadFromJson(Map<String, dynamic> json) {
     if (json['chat_color'] != null) {
       try {
@@ -93,9 +103,9 @@ abstract class AppConfig {
     if (json['application_welcome_message'] is String) {
       _applicationWelcomeMessage = json['application_welcome_message'];
     }
-    if (json['default_homeserver'] is String) {
-      _defaultHomeserver = json['default_homeserver'];
-    }
+    // if (json['default_homeserver'] is String) {
+    //   _defaultHomeserver = json['default_homeserver'];
+    // }
     if (json['privacy_url'] is String) {
       _privacyUrl = json['privacy_url'];
     }

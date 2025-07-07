@@ -30,7 +30,5 @@ class User {
   const User(this.name, this.password);
 }
 
-const homeserver = 'http://${String.fromEnvironment(
-  'HOMESERVER',
-  defaultValue: 'localhost',
-)}';
+// This is the homeserver URL that will be used for the integration tests.
+const homeserver = '';

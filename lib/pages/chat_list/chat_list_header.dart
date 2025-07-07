@@ -34,11 +34,8 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
       title: StreamBuilder(
         stream: client.onSyncStatus.stream,
         builder: (context, snapshot) {
-          final status = client.onSyncStatus.value ??
-              const SyncStatusUpdate(SyncStatus.waitingForResponse);
-          final hide = client.onSync.value != null &&
-              status.status != SyncStatus.error &&
-              client.prevBatch != null;
+          final status = client.onSyncStatus.value ?? const SyncStatusUpdate(SyncStatus.waitingForResponse);
+          final hide = client.onSync.value != null && status.status != SyncStatus.error && client.prevBatch != null;
           return TextField(
             controller: controller.searchController,
             focusNode: controller.searchFocusNode,
@@ -55,13 +52,9 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                 borderRadius: BorderRadius.circular(99),
               ),
               contentPadding: EdgeInsets.zero,
-              hintText: hide
-                  ? L10n.of(context).searchChatsRooms
-                  : status.calcLocalizedString(context),
+              hintText: hide ? L10n.of(context).searchChatsRooms : status.calcLocalizedString(context),
               hintStyle: TextStyle(
-                color: status.error != null
-                    ? Colors.orange
-                    : theme.colorScheme.onPrimaryContainer,
+                color: status.error != null ? Colors.orange : theme.colorScheme.onPrimaryContainer,
                 fontWeight: FontWeight.normal,
               ),
               prefixIcon: hide
@@ -119,14 +112,13 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                           ),
                           icon: const Icon(Icons.edit_outlined, size: 16),
                           label: Text(
-                            controller.searchServer ??
-                                Matrix.of(context).client.homeserver!.host,
+                            controller.searchServer ?? Matrix.of(context).client.homeserver!.host,
                             maxLines: 2,
                           ),
                         )
-                  : SizedBox(
-                      width: 0,
-                      child: ClientChooserButton(controller),
+                  : const SizedBox(
+                      // width: 0,
+                      // child: ClientChooserButton(controller),
                     ),
             ),
           );

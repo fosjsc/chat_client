@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/pages/auto_login/auto_login.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -44,17 +46,22 @@ abstract class AppRoutes {
     BuildContext context,
     GoRouterState state,
   ) =>
-      Matrix.of(context).widget.clients.any((client) => client.isLogged())
-          ? '/rooms'
-          : null;
+      Matrix.of(context).widget.clients.any((client) => client.isLogged()) ? '/rooms' : null;
 
   static FutureOr<String?> loggedOutRedirect(
     BuildContext context,
     GoRouterState state,
-  ) =>
-      Matrix.of(context).widget.clients.any((client) => client.isLogged())
-          ? null
-          : '/home';
+  ) {
+    final clients = Matrix.of(context).widget.clients;
+    for (final client in clients) {
+      if (client.userID != null && client.userID == AppConfig.username) {
+        Matrix.of(context).setActiveClient(client);
+        return null; // User is logged in, no redirect needed
+      }
+    }
+
+    return '/auto-login';
+  }
 
   AppRoutes();
 
@@ -62,29 +69,15 @@ abstract class AppRoutes {
     GoRoute(
       path: '/',
       redirect: (context, state) =>
-          Matrix.of(context).widget.clients.any((client) => client.isLogged())
-              ? '/rooms'
-              : '/home',
+          Matrix.of(context).widget.clients.any((client) => client.isLogged()) ? '/rooms' : '/auto-login',
     ),
     GoRoute(
-      path: '/home',
+      path: '/auto-login',
       pageBuilder: (context, state) => defaultPageBuilder(
         context,
         state,
-        const HomeserverPicker(addMultiAccount: false),
+        const AutoLogin(),
       ),
-      redirect: loggedInRedirect,
-      routes: [
-        GoRoute(
-          path: 'login',
-          pageBuilder: (context, state) => defaultPageBuilder(
-            context,
-            state,
-            Login(client: state.extra as Client),
-          ),
-          redirect: loggedInRedirect,
-        ),
-      ],
     ),
     GoRoute(
       path: '/logs',
@@ -109,13 +102,11 @@ abstract class AppRoutes {
       pageBuilder: (context, state, child) => noTransitionPageBuilder(
         context,
         state,
-        FluffyThemes.isColumnMode(context) &&
-                state.fullPath?.startsWith('/rooms/settings') == false
+        FluffyThemes.isColumnMode(context) && state.fullPath?.startsWith('/rooms/settings') == false
             ? TwoColumnLayout(
                 mainView: ChatList(
                   activeChat: state.pathParameters['roomid'],
-                  displayNavigationRail:
-                      state.path?.startsWith('/rooms/settings') != true,
+                  displayNavigationRail: state.path?.startsWith('/rooms/settings') != true,
                 ),
                 sideView: child,
               )
@@ -202,9 +193,7 @@ abstract class AppRoutes {
                   pageBuilder: (context, state) => defaultPageBuilder(
                     context,
                     state,
-                    FluffyThemes.isColumnMode(context)
-                        ? const EmptyPage()
-                        : const Settings(),
+                    FluffyThemes.isColumnMode(context) ? const EmptyPage() : const Settings(),
                   ),
                   routes: [
                     GoRoute(
@@ -337,9 +326,7 @@ abstract class AppRoutes {
               path: ':roomid',
               pageBuilder: (context, state) {
                 final body = state.uri.queryParameters['body'];
-                var shareItems = state.extra is List<ShareItem>
-                    ? state.extra as List<ShareItem>
-                    : null;
+                var shareItems = state.extra is List<ShareItem> ? state.extra as List<ShareItem> : null;
                 if (body != null && body.isNotEmpty) {
                   shareItems ??= [];
                   shareItems.add(TextShareItem(body));

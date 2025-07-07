@@ -1,0 +1,19 @@
+{
+  {
+    flutter_js;
+  }
+}
+{
+  {
+    flutter_build_config;
+  }
+}
+
+_flutter.loader.load({
+  onEntrypointLoaded: async function onEntrypointLoaded(engineInitializer) {
+    let engine = await engineInitializer.initializeEngine({
+      multiViewEnabled: true, // Enables embedded mode.
+    });
+    let app = await engine.runApp();
+  },
+});

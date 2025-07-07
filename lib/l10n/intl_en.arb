@@ -2094,7 +2094,7 @@
     "type": "String",
     "placeholders": {}
   },
-  "title": "FluffyChat",
+  "title": "fChat",
   "@title": {
     "description": "Title for the application",
     "type": "String",

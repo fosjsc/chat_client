@@ -1,3 +1,7 @@
+import 'dart:ui_web' as ui_web show views;
+
+import 'package:fluffychat/utils/initdata_js_type.dart';
+import 'package:fluffychat/widgets/multi_view_app.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -14,8 +18,6 @@ import 'utils/background_push.dart';
 import 'widgets/fluffy_chat_app.dart';
 
 void main() async {
-  Logs().i('Welcome to ${AppConfig.applicationName} <3');
-
   // Our background push shared isolate accesses flutter-internal things very early in the startup proccess
   // To make sure that the parts of flutter needed are started up already, we need to ensure that the
   // widget bindings are initialized already.
@@ -30,8 +32,7 @@ void main() async {
   // If the app starts in detached mode, we assume that it is in
   // background fetch mode for processing push notifications. This is
   // currently only supported on Android.
-  if (PlatformInfos.isAndroid &&
-      AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
+  if (PlatformInfos.isAndroid && AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
     // Do not send online presences when app is in background fetch mode.
     for (final client in clients) {
       client.backgroundSync = false;
@@ -62,8 +63,7 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   String? pin;
   if (PlatformInfos.isMobile) {
     try {
-      pin =
-          await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
+      pin = await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
     } catch (e, s) {
       Logs().d('Unable to read PIN from Secure storage', e, s);
     }
@@ -74,7 +74,27 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   await firstClient?.roomsLoading;
   await firstClient?.accountDataLoading;
 
-  runApp(FluffyChatApp(clients: clients, pincode: pin, store: store));
+  // runApp(FluffyChatApp(clients: clients, pincode: pin, store: store));
+  runWidget(
+    MultiViewApp(
+      viewBuilder: (BuildContext context) {
+        final int viewId = View.of(context).viewId;
+        final initialData = ui_web.views.getInitialData(viewId) as InitialData?;
+        if (initialData != null) {
+          AppConfig.setUsername(initialData.username);
+          AppConfig.setPassword(initialData.password);
+          AppConfig.setHomeserver(initialData.homeserver_url);
+          AppConfig.setToRoomId(initialData.room_id);
+        }
+
+        return FluffyChatApp(
+          clients: clients,
+          pincode: pin,
+          store: store,
+        );
+      },
+    ),
+  );
 }
 
 /// Watches the lifecycle changes to start the application when it

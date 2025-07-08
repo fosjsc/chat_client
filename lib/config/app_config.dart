@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'dart:ui_web' as ui_web;
 
+import 'package:fluffychat/utils/initdata_js_type.dart';
+import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 abstract class AppConfig {
@@ -71,16 +74,16 @@ abstract class AppConfig {
     path: 'servers.json',
   );
 
-  static String? username;
-  static String? password;
+  // static String? username;
+  // static String? password;
 
-  static setUsername(String? value) {
-    username = value;
-  }
+  // static setUsername(String? value) {
+  //   username = value;
+  // }
 
-  static setPassword(String? value) {
-    password = value;
-  }
+  // static setPassword(String? value) {
+  //   password = value;
+  // }
 
   static setHomeserver(String? value) {
     defaultHomeserver = value;
@@ -121,5 +124,16 @@ abstract class AppConfig {
     if (json['hide_unknown_events'] is bool) {
       hideUnknownEvents = json['hide_unknown_events'];
     }
+  }
+
+  static getDataByViewId(BuildContext context) {
+    final viewId = View.of(context).viewId;
+    final initialData = ui_web.views.getInitialData(viewId) as InitialData?;
+
+    if (initialData != null) {
+      return initialData.toJson();
+    }
+
+    return null;
   }
 }

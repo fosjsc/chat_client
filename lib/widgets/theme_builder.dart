@@ -16,11 +16,13 @@ class ThemeBuilder extends StatefulWidget {
 
   final String themeModeSettingsKey;
   final String primaryColorSettingsKey;
+  final ThemeMode? mode;
 
   const ThemeBuilder({
     required this.builder,
     this.themeModeSettingsKey = 'theme_mode',
     this.primaryColorSettingsKey = 'primary_color',
+    this.mode,
     super.key,
   });
 
@@ -37,29 +39,27 @@ class ThemeController extends State<ThemeBuilder> {
 
   Color? get primaryColor => _primaryColor;
 
-  static ThemeController of(BuildContext context) =>
-      Provider.of<ThemeController>(
+  static ThemeController of(BuildContext context) => Provider.of<ThemeController>(
         context,
         listen: false,
       );
 
   void _loadData(_) async {
-    final preferences =
-        _sharedPreferences ??= await SharedPreferences.getInstance();
+    final preferences = _sharedPreferences ??= await SharedPreferences.getInstance();
 
-    final rawThemeMode = preferences.getString(widget.themeModeSettingsKey);
+    // final rawThemeMode = preferences.getString(widget.themeModeSettingsKey);
     final rawColor = preferences.getInt(widget.primaryColorSettingsKey);
 
     setState(() {
-      _themeMode = ThemeMode.values
-          .singleWhereOrNull((value) => value.name == rawThemeMode);
+      _themeMode = ThemeMode.values.singleWhereOrNull((value) => value == widget.mode);
+      // _themeMode = ThemeMode.values
+      //     .singleWhereOrNull((value) => value.name == rawThemeMode);
       _primaryColor = rawColor == null ? null : Color(rawColor);
     });
   }
 
   Future<void> setThemeMode(ThemeMode newThemeMode) async {
-    final preferences =
-        _sharedPreferences ??= await SharedPreferences.getInstance();
+    final preferences = _sharedPreferences ??= await SharedPreferences.getInstance();
     await preferences.setString(widget.themeModeSettingsKey, newThemeMode.name);
     setState(() {
       _themeMode = newThemeMode;
@@ -67,8 +67,7 @@ class ThemeController extends State<ThemeBuilder> {
   }
 
   Future<void> setPrimaryColor(Color? newPrimaryColor) async {
-    final preferences =
-        _sharedPreferences ??= await SharedPreferences.getInstance();
+    final preferences = _sharedPreferences ??= await SharedPreferences.getInstance();
     if (newPrimaryColor == null) {
       await preferences.remove(widget.primaryColorSettingsKey);
     } else {

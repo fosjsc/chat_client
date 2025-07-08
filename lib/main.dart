@@ -1,6 +1,3 @@
-import 'dart:ui_web' as ui_web;
-
-import 'package:fluffychat/utils/initdata_js_type.dart';
 import 'package:fluffychat/widgets/multi_view_app.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +15,7 @@ import 'utils/background_push.dart';
 import 'widgets/fluffy_chat_app.dart';
 
 void main() async {
-  Logs().i('Welcome to ${AppConfig.applicationName} <3');
+  // Logs().i('Welcome to ${AppConfig.applicationName} <3');
 
   // Our background push shared isolate accesses flutter-internal things very early in the startup proccess
   // To make sure that the parts of flutter needed are started up already, we need to ensure that the
@@ -80,19 +77,10 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   runWidget(
     MultiViewApp(
       viewBuilder: (BuildContext context) {
-        final int viewId = View.of(context).viewId;
-        final initialData = ui_web.views.getInitialData(viewId) as InitialData?;
-        if (initialData != null) {
-          AppConfig.setUsername(initialData.username);
-          AppConfig.setPassword(initialData.password);
-          AppConfig.setHomeserver(initialData.homeserver_url);
+        final initialData = AppConfig.getDataByViewId(context);
+        if (initialData['homeserver_url'] != null) {
+          AppConfig.setHomeserver(initialData['homeserver_url']);
         }
-
-        // AppConfig.setUsername('@fos_employee_210:localhost:8008');
-        // AppConfig.setPassword('231199@Huyson');
-        // AppConfig.setUsername('@fos_employee_55:localhost:8008');
-        // AppConfig.setPassword('111111');
-        // AppConfig.setHomeserver('http://localhost:8008');
 
         return FluffyChatApp(
           clients: clients,

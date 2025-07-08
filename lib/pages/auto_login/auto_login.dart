@@ -84,12 +84,10 @@ class AutoLoginController extends State<AutoLogin> {
     }
   }
 
-  Future<void> loginAction() async {
+  Future<void> loginAction(String username, String password) async {
     final matrix = Matrix.of(context);
-    final username = AppConfig.username;
-    final password = AppConfig.password;
 
-    if (username == null || username.isEmpty || password == null || password.isEmpty) {
+    if (username.isEmpty || password.isEmpty) {
       setState(
         () => error = L10n.of(context).oopsSomethingWentWrong,
       );
@@ -127,29 +125,38 @@ class AutoLoginController extends State<AutoLogin> {
   Future<void> autoLoginAction() async {
     try {
       final clients = Matrix.of(context).widget.clients;
-
+      final initialData = AppConfig.getDataByViewId(context);
 
       for (final client in clients) {
         if (client.userID == null) {
           continue;
         }
 
-        if (client.isLogged() && client.userID == AppConfig.username) {
+        if (client.isLogged() && client.userID == initialData?['username']) {
           Matrix.of(context).setActiveClient(client);
           return;
         }
       }
 
       final isLoggedIn = clients.any((client) {
-        return client.isLogged() && client.userID == AppConfig.username;
+        return client.isLogged() && client.userID == initialData?['username'];
       });
-
 
       if (isLoggedIn) {
         FluffyChatApp.router.go('/rooms');
       } else {
         await checkHomeServerAction();
-        await loginAction();
+        if (initialData?['username'] != null && initialData?['password'] != null) {
+          await loginAction(
+            initialData?['username'] ?? '',
+            initialData?['password'] ?? '',
+          );
+        } else {
+          setState(() {
+            error = L10n.of(context).oopsSomethingWentWrong;
+            isLoading = false;
+          });
+        }
       }
     } catch (e) {
       setState(() => error = e.toString());

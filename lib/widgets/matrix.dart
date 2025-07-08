@@ -290,7 +290,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       c.onSync.stream.first.then((s) {
-        html.Notification.requestPermission();
+        // html.Notification.requestPermission();
         onNotification[name] ??= c.onNotification.stream.listen(showLocalNotification);
       });
     }

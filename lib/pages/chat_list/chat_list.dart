@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fluffychat/utils/background_push.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,8 +34,7 @@ import '../../utils/url_launcher.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
 
-import 'package:fluffychat/utils/tor_stub.dart'
-    if (dart.library.html) 'package:tor_detector_web/tor_detector_web.dart';
+import 'package:fluffychat/utils/tor_stub.dart' if (dart.library.html) 'package:tor_detector_web/tor_detector_web.dart';
 
 enum PopupMenuAction {
   settings,
@@ -85,17 +85,14 @@ class ChatList extends StatefulWidget {
   ChatListController createState() => ChatListController();
 }
 
-class ChatListController extends State<ChatList>
-    with TickerProviderStateMixin, RouteAware {
+class ChatListController extends State<ChatList> with TickerProviderStateMixin, RouteAware {
   StreamSubscription? _intentDataStreamSubscription;
 
   StreamSubscription? _intentFileStreamSubscription;
 
   StreamSubscription? _intentUriStreamSubscription;
 
-  ActiveFilter activeFilter = AppConfig.separateChatTypes
-      ? ActiveFilter.messages
-      : ActiveFilter.allChats;
+  ActiveFilter activeFilter = AppConfig.separateChatTypes ? ActiveFilter.messages : ActiveFilter.allChats;
 
   String? _activeSpaceId;
   String? get activeSpaceId => _activeSpaceId;
@@ -242,11 +239,8 @@ class ChatListController extends State<ChatList>
     }
   }
 
-  List<Room> get filteredRooms => Matrix.of(context)
-      .client
-      .rooms
-      .where(getRoomFilterByActiveFilter(activeFilter))
-      .toList();
+  List<Room> get filteredRooms =>
+      Matrix.of(context).client.rooms.where(getRoomFilterByActiveFilter(activeFilter)).toList();
 
   bool isSearchMode = false;
   Future<QueryPublicRoomsResponse>? publicRoomsResponse;
@@ -270,9 +264,7 @@ class ChatListController extends State<ChatList>
       initialText: searchServer,
       keyboardType: TextInputType.url,
       autocorrect: false,
-      validator: (server) => server.contains('.') == true
-          ? null
-          : L10n.of(context).invalidServerName,
+      validator: (server) => server.contains('.') == true ? null : L10n.of(context).invalidServerName,
     );
     if (newServer == null) return;
     Matrix.of(context).store.setString(_serverStoreNamespace, newServer);
@@ -305,9 +297,7 @@ class ChatListController extends State<ChatList>
 
       if (searchQuery.isValidMatrixId &&
           searchQuery.sigil == '#' &&
-          roomSearchResult.chunk
-                  .any((room) => room.canonicalAlias == searchQuery) ==
-              false) {
+          roomSearchResult.chunk.any((room) => room.canonicalAlias == searchQuery) == false) {
         final response = await client.getRoomIdByAlias(searchQuery);
         final roomId = response.roomId;
         if (roomId != null) {
@@ -407,8 +397,7 @@ class ChatListController extends State<ChatList>
   }
 
   // Needs to match GroupsSpacesEntry for 'separate group' checking.
-  List<Room> get spaces =>
-      Matrix.of(context).client.rooms.where((r) => r.isSpace).toList();
+  List<Room> get spaces => Matrix.of(context).client.rooms.where((r) => r.isSpace).toList();
 
   String? get activeChat => widget.activeChat;
 
@@ -450,18 +439,14 @@ class ChatListController extends State<ChatList>
     if (!PlatformInfos.isMobile) return;
 
     // For sharing images coming from outside the app while the app is in the memory
-    _intentFileStreamSubscription = ReceiveSharingIntent.instance
-        .getMediaStream()
-        .listen(_processIncomingSharedMedia, onError: print);
+    _intentFileStreamSubscription =
+        ReceiveSharingIntent.instance.getMediaStream().listen(_processIncomingSharedMedia, onError: print);
 
     // For sharing images coming from outside the app while the app is closed
-    ReceiveSharingIntent.instance
-        .getInitialMedia()
-        .then(_processIncomingSharedMedia);
+    ReceiveSharingIntent.instance.getInitialMedia().then(_processIncomingSharedMedia);
 
     // For receiving shared Uris
-    _intentUriStreamSubscription =
-        AppLinks().uriLinkStream.listen(_processIncomingUris);
+    _intentUriStreamSubscription = AppLinks().uriLinkStream.listen(_processIncomingUris);
 
     if (PlatformInfos.isAndroid) {
       final shortcuts = FlutterShortcuts();
@@ -481,11 +466,15 @@ class ChatListController extends State<ChatList>
     scrollController.addListener(_onScroll);
     _waitForFirstSync();
     _hackyWebRTCFixForWeb();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        searchServer =
-            Matrix.of(context).store.getString(_serverStoreNamespace);
-        Matrix.of(context).backgroundPush?.setupPush();
+        searchServer = Matrix.of(context).store.getString(_serverStoreNamespace);
+        if (Matrix.of(context).backgroundPush == null) {
+          Matrix.of(context).backgroundPush = BackgroundPush(Matrix.of(context));
+          Matrix.of(context).backgroundPush!.setupPush();
+        } else {
+          Matrix.of(context).backgroundPush?.setupPush();
+        }
         UpdateNotifier.showUpdateSnackBar(context);
       }
 
@@ -514,8 +503,7 @@ class ChatListController extends State<ChatList>
     BuildContext posContext, [
     Room? space,
   ]) async {
-    final overlay =
-        Overlay.of(posContext).context.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(posContext).context.findRenderObject() as RenderBox;
 
     final button = posContext.findRenderObject() as RenderBox;
 
@@ -530,8 +518,7 @@ class ChatListController extends State<ChatList>
       Offset.zero & overlay.size,
     );
 
-    final displayname =
-        room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
+    final displayname = room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
 
     final spacesWithPowerLevels = room.client.rooms
         .where(
@@ -560,8 +547,7 @@ class ChatListController extends State<ChatList>
                 constraints: const BoxConstraints(maxWidth: 128),
                 child: Text(
                   displayname,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -603,9 +589,7 @@ class ChatListController extends State<ChatList>
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  room.pushRuleState == PushRuleState.notify
-                      ? L10n.of(context).muteChat
-                      : L10n.of(context).unmuteChat,
+                  room.pushRuleState == PushRuleState.notify ? L10n.of(context).muteChat : L10n.of(context).unmuteChat,
                 ),
               ],
             ),
@@ -616,15 +600,11 @@ class ChatListController extends State<ChatList>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  room.markedUnread
-                      ? Icons.mark_as_unread
-                      : Icons.mark_as_unread_outlined,
+                  room.markedUnread ? Icons.mark_as_unread : Icons.mark_as_unread_outlined,
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  room.markedUnread
-                      ? L10n.of(context).markAsRead
-                      : L10n.of(context).markAsUnread,
+                  room.markedUnread ? L10n.of(context).markAsRead : L10n.of(context).markAsUnread,
                 ),
               ],
             ),
@@ -639,9 +619,7 @@ class ChatListController extends State<ChatList>
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  room.isFavourite
-                      ? L10n.of(context).unpin
-                      : L10n.of(context).pin,
+                  room.isFavourite ? L10n.of(context).unpin : L10n.of(context).pin,
                 ),
               ],
             ),
@@ -670,9 +648,7 @@ class ChatListController extends State<ChatList>
               ),
               const SizedBox(width: 12),
               Text(
-                room.membership == Membership.invite
-                    ? L10n.of(context).delete
-                    : L10n.of(context).leave,
+                room.membership == Membership.invite ? L10n.of(context).delete : L10n.of(context).leave,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
@@ -709,9 +685,7 @@ class ChatListController extends State<ChatList>
         await showFutureLoadingDialog(
           context: context,
           future: () => room.setPushRuleState(
-            room.pushRuleState == PushRuleState.notify
-                ? PushRuleState.mentionsOnly
-                : PushRuleState.notify,
+            room.pushRuleState == PushRuleState.notify ? PushRuleState.mentionsOnly : PushRuleState.notify,
           ),
         );
         return;
@@ -738,8 +712,7 @@ class ChatListController extends State<ChatList>
               .map(
                 (space) => AdaptiveModalAction(
                   value: space,
-                  label: space
-                      .getLocalizedDisplayname(MatrixLocals(L10n.of(context))),
+                  label: space.getLocalizedDisplayname(MatrixLocals(L10n.of(context))),
                 ),
               )
               .toList(),
@@ -795,14 +768,13 @@ class ChatListController extends State<ChatList>
   bool waitForFirstSync = false;
 
   Future<void> _waitForFirstSync() async {
-    final router = GoRouter.of(context);
+    // final router = GoRouter.of(context);
     final client = Matrix.of(context).client;
     await client.roomsLoading;
     await client.accountDataLoading;
     await client.userDeviceKeysLoading;
     if (client.prevBatch == null) {
-      await client.onSyncStatus.stream
-          .firstWhere((status) => status.status == SyncStatus.finished);
+      await client.onSyncStatus.stream.firstWhere((status) => status.status == SyncStatus.finished);
 
       if (!mounted) return;
       setState(() {
@@ -874,20 +846,15 @@ class ChatListController extends State<ChatList>
     setState(() {
       _activeSpaceId = null;
       Matrix.of(context).activeBundle = bundle;
-      if (!Matrix.of(context)
-          .currentBundle!
-          .any((client) => client == Matrix.of(context).client)) {
-        Matrix.of(context)
-            .setActiveClient(Matrix.of(context).currentBundle!.first);
+      if (!Matrix.of(context).currentBundle!.any((client) => client == Matrix.of(context).client)) {
+        Matrix.of(context).setActiveClient(Matrix.of(context).currentBundle!.first);
       }
     });
   }
 
   void editBundlesForAccount(String? userId, String? activeBundle) async {
     final l10n = L10n.of(context);
-    final client = Matrix.of(context)
-        .widget
-        .clients[Matrix.of(context).getClientIndexByMatrixId(userId!)];
+    final client = Matrix.of(context).widget.clients[Matrix.of(context).getClientIndexByMatrixId(userId!)];
     final action = await showModalActionPopup<EditBundleAction>(
       context: context,
       title: L10n.of(context).editBundlesForAccount,
@@ -926,16 +893,11 @@ class ChatListController extends State<ChatList>
     }
   }
 
-  bool get displayBundles =>
-      Matrix.of(context).hasComplexBundles &&
-      Matrix.of(context).accountBundles.keys.length > 1;
+  bool get displayBundles => Matrix.of(context).hasComplexBundles && Matrix.of(context).accountBundles.keys.length > 1;
 
   String? get secureActiveBundle {
     if (Matrix.of(context).activeBundle == null ||
-        !Matrix.of(context)
-            .accountBundles
-            .keys
-            .contains(Matrix.of(context).activeBundle)) {
+        !Matrix.of(context).accountBundles.keys.contains(Matrix.of(context).activeBundle)) {
       return Matrix.of(context).accountBundles.keys.first;
     }
     return Matrix.of(context).activeBundle;

@@ -54,8 +54,9 @@ abstract class AppRoutes {
     GoRouterState state,
   ) {
     final clients = Matrix.of(context).widget.clients;
+    final initData = AppConfig.getDataByViewId(context);
     for (final client in clients) {
-      if (client.isLogged() && client.userID != null && client.userID == AppConfig.username) {
+      if (client.isLogged() && client.userID != null && client.userID == initData?['username']) {
         Matrix.of(context).setActiveClient(client);
         return null; // User is logged in, no redirect needed
       }

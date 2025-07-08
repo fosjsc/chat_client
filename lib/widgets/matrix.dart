@@ -57,8 +57,7 @@ class Matrix extends StatefulWidget {
   MatrixState createState() => MatrixState();
 
   /// Returns the (nearest) Client instance of your application.
-  static MatrixState of(BuildContext context) =>
-      Provider.of<MatrixState>(context, listen: false);
+  static MatrixState of(BuildContext context) => Provider.of<MatrixState>(context, listen: false);
 }
 
 class MatrixState extends State<Matrix> with WidgetsBindingObserver {
@@ -84,8 +83,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   bool get isMultiAccount => widget.clients.length > 1;
 
-  int getClientIndexByMatrixId(String matrixId) =>
-      widget.clients.indexWhere((client) => client.userID == matrixId);
+  int getClientIndexByMatrixId(String matrixId) => widget.clients.indexWhere((client) => client.userID == matrixId);
 
   late String currentClientSecret;
   RequestTokenResponse? currentThreepidCreds;
@@ -138,8 +136,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
                 : a.bundle!.priority!.compareTo(b.bundle!.priority!),
       );
     }
-    return resBundles
-        .map((k, v) => MapEntry(k, v.map((vv) => vv.client).toList()));
+    return resBundles.map((k, v) => MapEntry(k, v.map((vv) => vv.client).toList()));
   }
 
   bool get hasComplexBundles => accountBundles.values.any((v) => v.length > 1);
@@ -153,33 +150,27 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     if (widget.clients.isNotEmpty && !client.isLogged()) {
       return client;
     }
-    final candidate =
-        _loginClientCandidate ??= await ClientManager.createClient(
+    final candidate = _loginClientCandidate ??= await ClientManager.createClient(
       '${AppConfig.applicationName}-${DateTime.now().millisecondsSinceEpoch}',
       store,
     )
-          ..onLoginStateChanged
-              .stream
-              .where((l) => l == LoginState.loggedIn)
-              .first
-              .then((_) {
-            if (!widget.clients.contains(_loginClientCandidate)) {
-              widget.clients.add(_loginClientCandidate!);
-            }
-            ClientManager.addClientNameToStore(
-              _loginClientCandidate!.clientName,
-              store,
-            );
-            _registerSubs(_loginClientCandidate!.clientName);
-            _loginClientCandidate = null;
-            FluffyChatApp.router.go('/rooms');
-          });
+      ..onLoginStateChanged.stream.where((l) => l == LoginState.loggedIn).first.then((_) {
+        if (!widget.clients.contains(_loginClientCandidate)) {
+          widget.clients.add(_loginClientCandidate!);
+        }
+        ClientManager.addClientNameToStore(
+          _loginClientCandidate!.clientName,
+          store,
+        );
+        _registerSubs(_loginClientCandidate!.clientName);
+        _loginClientCandidate = null;
+        FluffyChatApp.router.go('/rooms');
+      });
     if (widget.clients.isEmpty) widget.clients.add(candidate);
     return candidate;
   }
 
-  Client? getClientByName(String name) =>
-      widget.clients.firstWhereOrNull((c) => c.clientName == name);
+  Client? getClientByName(String name) => widget.clients.firstWhereOrNull((c) => c.clientName == name);
 
   final onRoomKeyRequestSub = <String, StreamSubscription>{};
   final onKeyVerificationRequestSub = <String, StreamSubscription>{};
@@ -212,8 +203,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     return route.split('/')[2];
   }
 
-  final linuxNotifications =
-      PlatformInfos.isLinux ? NotificationsClient() : null;
+  final linuxNotifications = PlatformInfos.isLinux ? NotificationsClient() : null;
   final Map<String, int> linuxNotificationIds = {};
 
   @override
@@ -230,8 +220,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   Future<void> initConfig() async {
     try {
-      final configJsonString =
-          utf8.decode((await http.get(Uri.parse('config.json'))).bodyBytes);
+      final configJsonString = utf8.decode((await http.get(Uri.parse('config.json'))).bodyBytes);
       final configJson = json.decode(configJsonString);
       AppConfig.loadFromJson(configJson);
     } on FormatException catch (_) {
@@ -249,12 +238,10 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       );
       return;
     }
-    onRoomKeyRequestSub[name] ??=
-        c.onRoomKeyRequest.stream.listen((RoomKeyRequest request) async {
+    onRoomKeyRequestSub[name] ??= c.onRoomKeyRequest.stream.listen((RoomKeyRequest request) async {
       if (widget.clients.any(
         ((cl) =>
-            cl.userID == request.requestingDevice.userId &&
-            cl.identityKey == request.requestingDevice.curve25519Key),
+            cl.userID == request.requestingDevice.userId && cl.identityKey == request.requestingDevice.curve25519Key),
       )) {
         Logs().i(
           '[Key Request] Request is from one of our own clients, forwarding the key...',
@@ -262,13 +249,10 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         await request.forwardKey();
       }
     });
-    onKeyVerificationRequestSub[name] ??= c.onKeyVerificationRequest.stream
-        .listen((KeyVerification request) async {
+    onKeyVerificationRequestSub[name] ??= c.onKeyVerificationRequest.stream.listen((KeyVerification request) async {
       var hidPopup = false;
       request.onUpdate = () {
-        if (!hidPopup &&
-            {KeyVerificationState.done, KeyVerificationState.error}
-                .contains(request.state)) {
+        if (!hidPopup && {KeyVerificationState.done, KeyVerificationState.error}.contains(request.state)) {
           FluffyChatApp.router.pop('dialog');
         }
         hidPopup = true;
@@ -276,8 +260,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       request.onUpdate = null;
       hidPopup = true;
       await KeyVerificationDialog(request: request).show(
-        FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
-            context,
+        FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ?? context,
       );
     });
     onLoginStateChanged[name] ??= c.onLoginStateChanged.stream.listen((state) {
@@ -290,8 +273,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       }
       if (loggedInWithMultipleClients && state != LoginState.loggedIn) {
         ScaffoldMessenger.of(
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
-              context,
+          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ?? context,
         ).showSnackBar(
           SnackBar(
             content: Text(L10n.of(context).oneClientLoggedOut),
@@ -302,16 +284,14 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
           FluffyChatApp.router.go('/rooms');
         }
       } else {
-        FluffyChatApp.router
-            .go(state == LoginState.loggedIn ? '/rooms' : '/auto-login');
+        FluffyChatApp.router.go(state == LoginState.loggedIn ? '/rooms' : '/auto-login');
       }
     });
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       c.onSync.stream.first.then((s) {
         html.Notification.requestPermission();
-        onNotification[name] ??=
-            c.onNotification.stream.listen(showLocalNotification);
+        onNotification[name] ??= c.onNotification.stream.listen(showLocalNotification);
       });
     }
   }
@@ -342,13 +322,10 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         this,
         onFcmError: (errorMsg, {Uri? link}) async {
           final result = await showOkCancelAlertDialog(
-            context: FluffyChatApp
-                    .router.routerDelegate.navigatorKey.currentContext ??
-                context,
+            context: FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ?? context,
             title: L10n.of(context).pushNotificationsNotAvailable,
             message: errorMsg,
-            okLabel:
-                link == null ? L10n.of(context).ok : L10n.of(context).learnMore,
+            okLabel: link == null ? L10n.of(context).ok : L10n.of(context).learnMore,
             cancelLabel: L10n.of(context).doNotShowAgain,
           );
           if (result == OkCancelResult.ok && link != null) {
@@ -377,11 +354,9 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final foreground = state != AppLifecycleState.inactive &&
-        state != AppLifecycleState.paused;
+    final foreground = state != AppLifecycleState.inactive && state != AppLifecycleState.paused;
     for (final client in widget.clients) {
-      client.syncPresence =
-          state == AppLifecycleState.resumed ? null : PresenceType.unavailable;
+      client.syncPresence = state == AppLifecycleState.resumed ? null : PresenceType.unavailable;
       if (PlatformInfos.isMobile) {
         client.backgroundSync = foreground;
         client.requestHistoryOnLimitedTimeline = !foreground;
@@ -392,51 +367,35 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   void initSettings() {
     AppConfig.fontSizeFactor =
-        double.tryParse(store.getString(SettingKeys.fontSizeFactor) ?? '') ??
-            AppConfig.fontSizeFactor;
+        double.tryParse(store.getString(SettingKeys.fontSizeFactor) ?? '') ?? AppConfig.fontSizeFactor;
 
-    AppConfig.renderHtml =
-        store.getBool(SettingKeys.renderHtml) ?? AppConfig.renderHtml;
+    AppConfig.renderHtml = store.getBool(SettingKeys.renderHtml) ?? AppConfig.renderHtml;
 
     AppConfig.swipeRightToLeftToReply =
-        store.getBool(SettingKeys.swipeRightToLeftToReply) ??
-            AppConfig.swipeRightToLeftToReply;
+        store.getBool(SettingKeys.swipeRightToLeftToReply) ?? AppConfig.swipeRightToLeftToReply;
 
-    AppConfig.hideRedactedEvents =
-        store.getBool(SettingKeys.hideRedactedEvents) ??
-            AppConfig.hideRedactedEvents;
+    AppConfig.hideRedactedEvents = store.getBool(SettingKeys.hideRedactedEvents) ?? AppConfig.hideRedactedEvents;
 
-    AppConfig.hideUnknownEvents =
-        store.getBool(SettingKeys.hideUnknownEvents) ??
-            AppConfig.hideUnknownEvents;
+    AppConfig.hideUnknownEvents = store.getBool(SettingKeys.hideUnknownEvents) ?? AppConfig.hideUnknownEvents;
 
-    AppConfig.separateChatTypes =
-        store.getBool(SettingKeys.separateChatTypes) ??
-            AppConfig.separateChatTypes;
+    AppConfig.separateChatTypes = store.getBool(SettingKeys.separateChatTypes) ?? AppConfig.separateChatTypes;
 
-    AppConfig.autoplayImages =
-        store.getBool(SettingKeys.autoplayImages) ?? AppConfig.autoplayImages;
+    AppConfig.autoplayImages = store.getBool(SettingKeys.autoplayImages) ?? AppConfig.autoplayImages;
 
     AppConfig.sendTypingNotifications =
-        store.getBool(SettingKeys.sendTypingNotifications) ??
-            AppConfig.sendTypingNotifications;
+        store.getBool(SettingKeys.sendTypingNotifications) ?? AppConfig.sendTypingNotifications;
 
     AppConfig.sendPublicReadReceipts =
-        store.getBool(SettingKeys.sendPublicReadReceipts) ??
-            AppConfig.sendPublicReadReceipts;
+        store.getBool(SettingKeys.sendPublicReadReceipts) ?? AppConfig.sendPublicReadReceipts;
 
-    AppConfig.sendOnEnter =
-        store.getBool(SettingKeys.sendOnEnter) ?? AppConfig.sendOnEnter;
+    AppConfig.sendOnEnter = store.getBool(SettingKeys.sendOnEnter) ?? AppConfig.sendOnEnter;
 
-    AppConfig.experimentalVoip = store.getBool(SettingKeys.experimentalVoip) ??
-        AppConfig.experimentalVoip;
+    AppConfig.experimentalVoip = store.getBool(SettingKeys.experimentalVoip) ?? AppConfig.experimentalVoip;
 
-    AppConfig.showPresences =
-        store.getBool(SettingKeys.showPresences) ?? AppConfig.showPresences;
+    AppConfig.showPresences = store.getBool(SettingKeys.showPresences) ?? AppConfig.showPresences;
 
     AppConfig.displayNavigationRail =
-        store.getBool(SettingKeys.displayNavigationRail) ??
-            AppConfig.displayNavigationRail;
+        store.getBool(SettingKeys.displayNavigationRail) ?? AppConfig.displayNavigationRail;
   }
 
   @override

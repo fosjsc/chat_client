@@ -1,3 +1,4 @@
+import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/auto_login/auto_login.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/material.dart';
@@ -15,14 +16,23 @@ class AutoLoginView extends StatelessWidget {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Center(
-                child: Text(
-                  controller.error ?? 'Has error',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: theme.colorScheme.onSurface,
+            : controller.error != null
+                ? Center(
+                    child: Text(
+                      L10n.of(context).oopsSomethingWentWrong,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      "View AutoLogin",
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
                   ),
-                ),
-              ),
       ),
     );
   }

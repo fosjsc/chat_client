@@ -45,8 +45,9 @@ abstract class AppRoutes {
   static FutureOr<String?> loggedInRedirect(
     BuildContext context,
     GoRouterState state,
-  ) =>
-      Matrix.of(context).widget.clients.any((client) => client.isLogged()) ? '/rooms' : null;
+  ) {
+    return Matrix.of(context).widget.clients.any((client) => client.isLogged()) ? '/rooms' : null;
+  }
 
   static FutureOr<String?> loggedOutRedirect(
     BuildContext context,
@@ -54,7 +55,7 @@ abstract class AppRoutes {
   ) {
     final clients = Matrix.of(context).widget.clients;
     for (final client in clients) {
-      if (client.userID != null && client.userID == AppConfig.username) {
+      if (client.isLogged() && client.userID != null && client.userID == AppConfig.username) {
         Matrix.of(context).setActiveClient(client);
         return null; // User is logged in, no redirect needed
       }

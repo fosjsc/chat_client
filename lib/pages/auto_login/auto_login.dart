@@ -110,11 +110,17 @@ class AutoLoginController extends State<AutoLogin> {
         initialDeviceDisplayName: PlatformInfos.clientName,
       );
     } on MatrixException catch (exception) {
-      setState(() => error = exception.errorMessage);
-      return setState(() => isLoading = false);
+      setState(() {
+        error = exception.errorMessage;
+        isLoading = false;
+      });
+      return;
     } catch (exception) {
-      setState(() => error = exception.toString());
-      return setState(() => isLoading = false);
+      setState(() {
+        error = exception.toString();
+        isLoading = false;
+      });
+      return;
     }
   }
 
@@ -122,16 +128,15 @@ class AutoLoginController extends State<AutoLogin> {
     try {
       final clients = Matrix.of(context).widget.clients;
 
-      print('AutoLogin: Found ${clients.length} clients');
 
       for (final client in clients) {
         if (client.userID == null) {
-          print('AutoLogin: Client has no userID, skipping');
           continue;
         }
 
-        if (client.userID == AppConfig.username) {
+        if (client.isLogged() && client.userID == AppConfig.username) {
           Matrix.of(context).setActiveClient(client);
+          return;
         }
       }
 
@@ -139,7 +144,6 @@ class AutoLoginController extends State<AutoLogin> {
         return client.isLogged() && client.userID == AppConfig.username;
       });
 
-      print('AutoLogin: isLoggedIn: $isLoggedIn');
 
       if (isLoggedIn) {
         FluffyChatApp.router.go('/rooms');

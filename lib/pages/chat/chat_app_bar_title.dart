@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -57,15 +58,15 @@ class ChatAppBarTitle extends StatelessWidget {
                   room.getLocalizedDisplayname(MatrixLocals(L10n.of(context))),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 16 * AppConfig.fontSizeFactor,
                   ),
                 ),
                 StreamBuilder(
                   stream: room.client.onSyncStatus.stream,
                   builder: (context, snapshot) {
-                    final status = room.client.onSyncStatus.value ??
-                        const SyncStatusUpdate(SyncStatus.waitingForResponse);
+                    final status =
+                        room.client.onSyncStatus.value ?? const SyncStatusUpdate(SyncStatus.waitingForResponse);
                     final hide = FluffyThemes.isColumnMode(context) ||
                         (room.client.onSync.value != null &&
                             status.status != SyncStatus.error &&
@@ -76,10 +77,8 @@ class ChatAppBarTitle extends StatelessWidget {
                           ? PresenceBuilder(
                               userId: room.directChatMatrixID,
                               builder: (context, presence) {
-                                final lastActiveTimestamp =
-                                    presence?.lastActiveTimestamp;
-                                final style =
-                                    Theme.of(context).textTheme.bodySmall;
+                                final lastActiveTimestamp = presence?.lastActiveTimestamp;
+                                final style = Theme.of(context).textTheme.bodySmall;
                                 if (presence?.currentlyActive == true) {
                                   return Text(
                                     L10n.of(context).currentlyActive,
@@ -89,8 +88,7 @@ class ChatAppBarTitle extends StatelessWidget {
                                 if (lastActiveTimestamp != null) {
                                   return Text(
                                     L10n.of(context).lastActiveAgo(
-                                      lastActiveTimestamp
-                                          .localizedTimeShort(context),
+                                      lastActiveTimestamp.localizedTimeShort(context),
                                     ),
                                     style: style,
                                   );
@@ -117,10 +115,8 @@ class ChatAppBarTitle extends StatelessWidget {
                                   child: Text(
                                     status.calcLocalizedString(context),
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      color: status.error != null
-                                          ? Theme.of(context).colorScheme.error
-                                          : null,
+                                      fontSize: 12 * AppConfig.fontSizeFactor,
+                                      color: status.error != null ? Theme.of(context).colorScheme.error : null,
                                     ),
                                   ),
                                 ),

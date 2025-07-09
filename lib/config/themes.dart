@@ -10,11 +10,9 @@ abstract class FluffyThemes {
 
   static const double navRailWidth = 80.0;
 
-  static bool isColumnModeByWidth(double width) =>
-      width > columnWidth * 2 + navRailWidth;
+  static bool isColumnModeByWidth(double width) => width > columnWidth * 2 + navRailWidth;
 
-  static bool isColumnMode(BuildContext context) =>
-      isColumnModeByWidth(MediaQuery.of(context).size.width);
+  static bool isColumnMode(BuildContext context) => isColumnModeByWidth(MediaQuery.of(context).size.width);
 
   static bool isThreeColumnMode(BuildContext context) =>
       MediaQuery.of(context).size.width > FluffyThemes.columnWidth * 3.5;
@@ -40,7 +38,8 @@ abstract class FluffyThemes {
 
   static ThemeData buildTheme(
     BuildContext context,
-    Brightness brightness, [
+    Brightness brightness,
+    double fontSizeFactor, [
     Color? seed,
   ]) {
     final colorScheme = ColorScheme.fromSeed(
@@ -53,9 +52,7 @@ abstract class FluffyThemes {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      dividerColor: brightness == Brightness.dark
-          ? colorScheme.surfaceContainerHighest
-          : colorScheme.surfaceContainer,
+      dividerColor: brightness == Brightness.dark ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainer,
       popupMenuTheme: PopupMenuThemeData(
         color: colorScheme.surfaceContainerLow,
         iconColor: colorScheme.onSurface,
@@ -90,8 +87,7 @@ abstract class FluffyThemes {
       ),
       appBarTheme: AppBarTheme(
         toolbarHeight: isColumnMode ? 72 : 56,
-        shadowColor:
-            isColumnMode ? colorScheme.surfaceContainer.withAlpha(128) : null,
+        shadowColor: isColumnMode ? colorScheme.surfaceContainer.withAlpha(128) : null,
         surfaceTintColor: isColumnMode ? colorScheme.surface : null,
         backgroundColor: isColumnMode ? colorScheme.surface : null,
         systemOverlayStyle: SystemUiOverlayStyle(
@@ -129,27 +125,36 @@ abstract class FluffyThemes {
           textStyle: const TextStyle(fontSize: 16),
         ),
       ),
+      textTheme: const TextTheme().copyWith(
+        displayLarge: TextStyle(fontSize: fontSizeFactor * 96),
+        displayMedium: TextStyle(fontSize: fontSizeFactor * 60),
+        displaySmall: TextStyle(fontSize: fontSizeFactor * 48),
+        headlineMedium: TextStyle(fontSize: fontSizeFactor * 34),
+        headlineSmall: TextStyle(fontSize: fontSizeFactor * 24),
+        titleLarge: TextStyle(fontSize: fontSizeFactor * 20),
+        titleMedium: TextStyle(fontSize: fontSizeFactor * 16),
+        titleSmall: TextStyle(fontSize: fontSizeFactor * 14),
+        bodyLarge: TextStyle(fontSize: fontSizeFactor * 16),
+        bodyMedium: TextStyle(fontSize: fontSizeFactor * 14),
+        bodySmall: TextStyle(fontSize: fontSizeFactor * 12),
+        labelLarge: TextStyle(fontSize: fontSizeFactor * 14),
+        labelMedium: TextStyle(fontSize: fontSizeFactor * 12),
+        labelSmall: TextStyle(fontSize: fontSizeFactor * 11),
+      ),
     );
   }
 }
 
 extension on Brightness {
-  Brightness get reversed =>
-      this == Brightness.dark ? Brightness.light : Brightness.dark;
+  Brightness get reversed => this == Brightness.dark ? Brightness.light : Brightness.dark;
 }
 
 extension BubbleColorTheme on ThemeData {
-  Color get bubbleColor => brightness == Brightness.light
-      ? colorScheme.primary
-      : colorScheme.primaryContainer;
+  Color get bubbleColor => brightness == Brightness.light ? colorScheme.primary : colorScheme.primaryContainer;
 
-  Color get onBubbleColor => brightness == Brightness.light
-      ? colorScheme.onPrimary
-      : colorScheme.onPrimaryContainer;
+  Color get onBubbleColor => brightness == Brightness.light ? colorScheme.onPrimary : colorScheme.onPrimaryContainer;
 
   Color get secondaryBubbleColor => HSLColor.fromColor(
-        brightness == Brightness.light
-            ? colorScheme.tertiary
-            : colorScheme.tertiaryContainer,
+        brightness == Brightness.light ? colorScheme.tertiary : colorScheme.tertiaryContainer,
       ).withSaturation(0.5).toColor();
 }

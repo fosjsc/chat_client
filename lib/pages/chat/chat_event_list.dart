@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,11 +28,13 @@ class ChatEventList extends StatelessWidget {
     if (timeline == null) {
       return const Center(child: CupertinoActivityIndicator());
     }
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     final colors = [
-      theme.secondaryBubbleColor,
-      theme.bubbleColor,
+      // theme.secondaryBubbleColor,
+      // theme.bubbleColor,
+      AppConfig.primaryColor,
+      AppConfig.primaryColor
     ];
 
     final horizontalPadding = FluffyThemes.isColumnMode(context) ? 8.0 : 0.0;

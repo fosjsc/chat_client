@@ -13,6 +13,7 @@ extension InitialDataExtension on InitialData {
   external String get pushAppId;
   external bool get darkMode;
   external String get lang;
+  external double get fontSizeFactor;
 
   toJson() {
     return {
@@ -24,6 +25,7 @@ extension InitialDataExtension on InitialData {
       "pushAppId": pushAppId,
       "darkMode": darkMode,
       "lang": lang,
+      "fontSizeFactor": fontSizeFactor,
     };
   }
 }

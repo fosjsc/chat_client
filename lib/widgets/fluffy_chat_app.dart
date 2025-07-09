@@ -44,16 +44,16 @@ class FluffyChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = AppConfig.getDataByViewId(context);
     return ThemeBuilder(
-      mode: data['darkMode'] == true ? ThemeMode.dark : ThemeMode.light,
+      mode: data?['darkMode'] == true ? ThemeMode.dark : ThemeMode.light,
       builder: (context, themeMode, primaryColor) => MaterialApp.router(
         // title: AppConfig.applicationName,
         themeMode: themeMode,
-        theme: FluffyThemes.buildTheme(context, Brightness.light, primaryColor),
-        darkTheme: FluffyThemes.buildTheme(context, Brightness.dark, primaryColor),
+        theme: FluffyThemes.buildTheme(context, Brightness.light, AppConfig.fontSizeFactor, primaryColor),
+        darkTheme: FluffyThemes.buildTheme(context, Brightness.dark, AppConfig.fontSizeFactor, primaryColor),
         scrollBehavior: CustomScrollBehavior(),
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
-        locale: L10n.supportedLocales.firstWhereOrNull((e) => e.languageCode == data['lang']),
+        locale: L10n.supportedLocales.firstWhereOrNull((e) => e.languageCode == data?['lang']),
         routerConfig: router,
         builder: (context, child) => AppLockWidget(
           pincode: pincode,

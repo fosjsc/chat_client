@@ -125,31 +125,31 @@ class AutoLoginController extends State<AutoLogin> {
   Future<void> autoLoginAction() async {
     try {
       final clients = Matrix.of(context).widget.clients;
-      final initialData = AppConfig.getDataByViewId(context);
+      final data = AppConfig.getDataByViewId(context);
 
       for (final client in clients) {
         if (client.userID == null) {
           continue;
         }
 
-        if (client.isLogged() && client.userID == initialData?['username']) {
+        if (client.isLogged() && client.userID == data?['username']) {
           Matrix.of(context).setActiveClient(client);
           return;
         }
       }
 
       final isLoggedIn = clients.any((client) {
-        return client.isLogged() && client.userID == initialData?['username'];
+        return client.isLogged() && client.userID == data?['username'];
       });
 
       if (isLoggedIn) {
         FluffyChatApp.router.go('/rooms');
       } else {
         await checkHomeServerAction();
-        if (initialData?['username'] != null && initialData?['password'] != null) {
+        if (data?['username'] != null && data?['password'] != null) {
           await loginAction(
-            initialData?['username'] ?? '',
-            initialData?['password'] ?? '',
+            data?['username'] ?? '',
+            data?['password'] ?? '',
           );
         } else {
           setState(() {

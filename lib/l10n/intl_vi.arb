@@ -10,7 +10,7 @@
     "type": "String",
     "placeholders": {}
   },
-  "acceptedTheInvitation": "Đã chấp nhận lời mời",
+  "acceptedTheInvitation": "{username} đã chấp nhận lời mời",
   "@acceptedTheInvitation": {
     "type": "String",
     "placeholders": {
@@ -1195,7 +1195,7 @@
   "invitedUsersOnly": "Chỉ người dùng được mời",
   "inviteForMe": "Mời cho tôi",
   "inviteText": "Văn bản mời",
-  "isTyping": "đang gõ...",
+  "isTyping": "Đang soạn tin nhắn...",
   "joinedTheChat": "👋 {username} đã tham gia cuộc trò chuyện",
   "@joinedTheChat": {
     "type": "String",
@@ -1374,7 +1374,7 @@
   "pushRules": "Quy tắc đẩy",
   "reason": "Lý do",
   "recording": "Đang ghi",
-  "redactedBy": "Đã được chỉnh sửa bởi {username}",
+  "redactedBy": "Đã được xoá bởi {username}}",
   "@redactedBy": {
     "type": "String",
     "placeholders": {
@@ -1384,7 +1384,7 @@
     }
   },
   "directChat": "Cuộc trò chuyện trực tiếp",
-  "redactedByBecause": "Đã được chỉnh sửa bởi {username} vì {reason}",
+  "redactedByBecause": "Đã được xoá bởi {username} vì {reason}",
   "@redactedByBecause": {
     "type": "String",
     "placeholders": {

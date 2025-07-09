@@ -19,7 +19,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
@@ -126,7 +125,7 @@ class BackgroundPush {
     await _flutterLocalNotificationsPlugin.cancel(roomId.hashCode);
 
     // Workaround for app icon badge not updating
-    if (Platform.isIOS) {
+    if (PlatformInfos.isIOS) {
       final unreadCount = client.rooms.where((room) => room.isUnreadOrInvited && room.id != roomId).length;
       if (unreadCount == 0) {
         FlutterNewBadger.removeBadge();

@@ -180,7 +180,7 @@ class ChatView extends StatelessWidget {
                 ),
                 backgroundColor: controller.selectedEvents.isEmpty
                     ? null
-                    : theme.colorScheme.tertiaryContainer,
+                    : theme.colorScheme.primary,
                 automaticallyImplyLeading: false,
                 leading: controller.selectMode
                     ? IconButton(
@@ -314,7 +314,7 @@ class ChatView extends StatelessWidget {
                               child: Material(
                                 clipBehavior: Clip.hardEdge,
                                 color: controller.selectedEvents.isNotEmpty
-                                    ? theme.colorScheme.tertiaryContainer
+                                    ? theme.colorScheme.primary
                                     : theme.colorScheme.surfaceContainerHigh,
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(24),

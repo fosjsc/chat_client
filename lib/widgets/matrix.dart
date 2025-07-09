@@ -165,7 +165,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         _registerSubs(_loginClientCandidate!.clientName);
         _loginClientCandidate = null;
         // FluffyChatApp.router.go('/rooms');
-        FluffyChatApp.router.go('/rooms-embedded/${AppConfig.toRoomId}');
+        final data = AppConfig.getDataByViewId(context);
+        FluffyChatApp.router.go('/rooms-embedded/${data?['room_id']}');
       });
     if (widget.clients.isEmpty) widget.clients.add(candidate);
     return candidate;
@@ -200,7 +201,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   String? get activeRoomId {
     final route = FluffyChatApp.router.routeInformationProvider.value.uri.path;
-    if (!route.startsWith('/rooms/')) return null;
+    if (!route.startsWith('/rooms-embedded/')) return null;
     return route.split('/')[2];
   }
 
@@ -282,19 +283,19 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         );
 
         if (state != LoginState.loggedIn) {
-          FluffyChatApp.router.go('/rooms');
+          FluffyChatApp.router.go('/rooms-embedded');
         }
       } else {
         // If we are logged in with only one client, we can go to the rooms page.
         // FluffyChatApp.router.go(state == LoginState.loggedIn ? '/rooms' : '/home');
-        print('Login state changed to $state for client ${AppConfig.toRoomId}');
-        FluffyChatApp.router.go(state == LoginState.loggedIn ? '/rooms-embedded/${AppConfig.toRoomId}' : '/home');
+        final data = AppConfig.getDataByViewId(context);
+        FluffyChatApp.router.go(state == LoginState.loggedIn ? '/rooms-embedded/${data?['room_id']}' : '/auto-login');
       }
     });
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       c.onSync.stream.first.then((s) {
-        html.Notification.requestPermission();
+        // html.Notification.requestPermission();
         onNotification[name] ??= c.onNotification.stream.listen(showLocalNotification);
       });
     }

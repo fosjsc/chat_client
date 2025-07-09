@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -40,16 +42,18 @@ class FluffyChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final data = AppConfig.getDataByViewId(context);
     return ThemeBuilder(
+      mode: data?['darkMode'] == true ? ThemeMode.dark : ThemeMode.light,
       builder: (context, themeMode, primaryColor) => MaterialApp.router(
         // title: AppConfig.applicationName,
         themeMode: themeMode,
         theme: FluffyThemes.buildTheme(context, Brightness.light, primaryColor),
-        darkTheme:
-            FluffyThemes.buildTheme(context, Brightness.dark, primaryColor),
+        darkTheme: FluffyThemes.buildTheme(context, Brightness.dark, primaryColor),
         scrollBehavior: CustomScrollBehavior(),
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
+        locale: L10n.supportedLocales.firstWhereOrNull((e) => e.languageCode == data?['lang']),
         routerConfig: router,
         builder: (context, child) => AppLockWidget(
           pincode: pincode,

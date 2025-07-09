@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/pages/chat_embedded/chat_embedded.dart';
-import 'package:fluffychat/pages/web_embedded/web_embedded.dart';
+import 'package:fluffychat/pages/auto_login/auto_login.dart';
 import 'package:fluffychat/widgets/layouts/empty_page.dart';
 import 'package:flutter/material.dart';
 
@@ -18,30 +18,34 @@ abstract class AppRoutes {
     GoRouterState state,
   ) {
     final clients = Matrix.of(context).widget.clients;
+    final data = AppConfig.getDataByViewId(context);
     for (final client in clients) {
-      if (client.userID != null && client.userID == AppConfig.username) {
+      if (client.isLogged() && client.userID != null && client.userID == data?['username']) {
         Matrix.of(context).setActiveClient(client);
         return null; // User is logged in, no redirect needed
       }
     }
 
-    return '/web-embedded';
+    return '/auto-login';
   }
 
   AppRoutes();
   static final List<RouteBase> routes = [
     GoRoute(
       path: '/',
-      redirect: (context, state) => Matrix.of(context).widget.clients.any((client) => client.isLogged())
-          ? '/rooms-embedded/${AppConfig.toRoomId}'
-          : '/web-embedded',
+      redirect: (context, state) {
+        final data = AppConfig.getDataByViewId(context);
+        return Matrix.of(context).widget.clients.any((client) => client.isLogged())
+            ? '/rooms-embedded/${data?['room_id']}'
+            : '/auto-login';
+      },
     ),
     GoRoute(
-      path: '/web-embedded',
+      path: '/auto-login',
       pageBuilder: (context, state) => defaultPageBuilder(
         context,
         state,
-        const WebEmbedded(),
+        const AutoLogin(),
       ),
     ),
     ShellRoute(

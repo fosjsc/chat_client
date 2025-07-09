@@ -1,6 +1,6 @@
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/pages/web_embedded/web_embedded_view.dart';
+import 'package:fluffychat/pages/auto_login/auto_login_view.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/tor_stub.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -11,14 +11,14 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:matrix/matrix.dart';
 
-class WebEmbedded extends StatefulWidget {
-  const WebEmbedded({super.key});
+class AutoLogin extends StatefulWidget {
+  const AutoLogin({super.key});
 
   @override
-  WebEmbeddedController createState() => WebEmbeddedController();
+  AutoLoginController createState() => AutoLoginController();
 }
 
-class WebEmbeddedController extends State<WebEmbedded> {
+class AutoLoginController extends State<AutoLogin> {
   String? error;
   List<LoginFlow>? loginFlows;
 
@@ -84,12 +84,10 @@ class WebEmbeddedController extends State<WebEmbedded> {
     }
   }
 
-  Future<void> loginAction() async {
+  Future<void> loginAction(String username, String password) async {
     final matrix = Matrix.of(context);
-    final username = AppConfig.username;
-    final password = AppConfig.password;
 
-    if (username == null || username.isEmpty || password == null || password.isEmpty) {
+    if (username.isEmpty || password.isEmpty) {
       setState(
         () => error = L10n.of(context).oopsSomethingWentWrong,
       );
@@ -119,26 +117,38 @@ class WebEmbeddedController extends State<WebEmbedded> {
   }
 
   Future<void> autoLoginAction() async {
-    final clients = Matrix.of(context).widget.clients;
+    try {
+      final clients = Matrix.of(context).widget.clients;
+      final data = AppConfig.getDataByViewId(context);
 
-    for (final client in clients) {
-      if (client.userID != null && client.userID == AppConfig.username) {
-        Matrix.of(context).setActiveClient(client);
+      for (final client in clients) {
+        if (client.userID == null) {
+          continue;
+        }
+        if (client.isLogged() && client.userID == data?['username']) {
+          Matrix.of(context).setActiveClient(client);
+          return;
+        }
       }
+
+      final isLoggedIn = clients.any((client) {
+        return client.isLogged() && client.userID == data?['username'];
+      });
+
+      if (isLoggedIn) {
+        FluffyChatApp.router.go('/rooms-embedded/${data['room_id']}');
+      } else {
+        await checkHomeServerAction();
+        await loginAction(
+          data?['username'] ?? '',
+          data?['password'] ?? '',
+        );
+      }
+    } catch (e) {
+      setState(() => error = e.toString());
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
-
-    final isLoggedIn = clients.any((client) {
-      return client.isLogged() && client.userID == AppConfig.username;
-    });
-
-    if (isLoggedIn) {
-      FluffyChatApp.router.go('/rooms-embedded/${AppConfig.toRoomId}');
-    } else {
-      await checkHomeServerAction();
-      await loginAction();
-    }
-
-    if (mounted) setState(() => isLoading = false);
   }
 
   @override
@@ -152,6 +162,6 @@ class WebEmbeddedController extends State<WebEmbedded> {
 
   @override
   Widget build(BuildContext context) {
-    return WebEmbeddedView(controller: this);
+    return AutoLoginView(controller: this);
   }
 }

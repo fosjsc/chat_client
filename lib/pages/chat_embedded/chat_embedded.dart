@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:fluffychat/pages/chat/send_file_dialog.dart';
 import 'package:fluffychat/pages/chat/send_location_dialog.dart';
 import 'package:fluffychat/pages/chat_embedded/chat_embedded_view.dart';
+import 'package:fluffychat/utils/background_push.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +106,22 @@ class _ChatEmbeddedPageState extends State<ChatEmbeddedPage> {
 
   @override
   void initState() {
-    getRoom();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (mounted) {
+        getRoom();
+        if (Matrix.of(context).backgroundPush == null) {
+          Matrix.of(context).backgroundPush = BackgroundPush(Matrix.of(context));
+          Matrix.of(context).backgroundPush!.setupPush();
+        } else {
+          Matrix.of(context).backgroundPush?.setupPush();
+        }
+      }
+
+      // Workaround for system UI overlay style not applied on app start
+      SystemChrome.setSystemUIOverlayStyle(
+        Theme.of(context).appBarTheme.systemOverlayStyle!,
+      );
+    });
     super.initState();
   }
 

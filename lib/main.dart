@@ -1,6 +1,3 @@
-import 'dart:ui_web' as ui_web show views;
-
-import 'package:fluffychat/utils/initdata_js_type.dart';
 import 'package:fluffychat/widgets/multi_view_app.dart';
 import 'package:flutter/material.dart';
 
@@ -78,13 +75,9 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   runWidget(
     MultiViewApp(
       viewBuilder: (BuildContext context) {
-        final int viewId = View.of(context).viewId;
-        final initialData = ui_web.views.getInitialData(viewId) as InitialData?;
-        if (initialData != null) {
-          AppConfig.setUsername(initialData.username);
-          AppConfig.setPassword(initialData.password);
-          AppConfig.setHomeserver(initialData.homeserver_url);
-          AppConfig.setToRoomId(initialData.room_id);
+        final data = AppConfig.getDataByViewId(context);
+        if (data?['homeserver_url'] != null) {
+          AppConfig.setHomeserver(data['homeserver_url']);
         }
 
         return FluffyChatApp(

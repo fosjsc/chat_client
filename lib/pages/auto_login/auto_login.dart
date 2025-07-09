@@ -139,13 +139,23 @@ class AutoLoginController extends State<AutoLogin> {
         FluffyChatApp.router.go('/rooms-embedded/${data['room_id']}');
       } else {
         await checkHomeServerAction();
-        await loginAction(
-          data?['username'] ?? '',
-          data?['password'] ?? '',
-        );
+        if (data?['username'] != null && data?['password'] != null) {
+          await loginAction(
+            data?['username'] ?? '',
+            data?['password'] ?? '',
+          );
+        } else {
+          setState(() {
+            error = L10n.of(context).oopsSomethingWentWrong;
+            isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      setState(() => error = e.toString());
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
     } finally {
       if (mounted) setState(() => isLoading = false);
     }

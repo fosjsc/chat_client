@@ -74,19 +74,12 @@ abstract class AppConfig {
     path: 'servers.json',
   );
 
-  // static String? username;
-  // static String? password;
-
-  // static setUsername(String? value) {
-  //   username = value;
-  // }
-
-  // static setPassword(String? value) {
-  //   password = value;
-  // }
-
   static setHomeserver(String? value) {
     defaultHomeserver = value;
+  }
+
+  static setFontSizeFactor(double? value) {
+    fontSizeFactor = value ?? fontSizeFactor;
   }
 
   static void loadFromJson(Map<String, dynamic> json) {

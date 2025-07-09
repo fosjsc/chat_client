@@ -76,8 +76,9 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
     MultiViewApp(
       viewBuilder: (BuildContext context) {
         final data = AppConfig.getDataByViewId(context);
-        if (data?['homeserver_url'] != null) {
+        if (data != null) {
           AppConfig.setHomeserver(data['homeserver_url']);
+          AppConfig.setFontSizeFactor(data?['fontSizeFactor']);
         }
 
         return FluffyChatApp(

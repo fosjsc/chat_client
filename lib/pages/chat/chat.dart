@@ -96,8 +96,7 @@ class ChatPageWithRoom extends StatefulWidget {
   ChatController createState() => ChatController();
 }
 
-class ChatController extends State<ChatPageWithRoom>
-    with WidgetsBindingObserver {
+class ChatController extends State<ChatPageWithRoom> with WidgetsBindingObserver {
   Room get room => sendingClient.getRoomById(roomId) ?? widget.room;
 
   late Client sendingClient;
@@ -158,8 +157,7 @@ class ChatController extends State<ChatPageWithRoom>
 
   bool _scrolledUp = false;
 
-  bool get showScrollDownButton =>
-      _scrolledUp || timeline?.allowNewEvent == false;
+  bool get showScrollDownButton => _scrolledUp || timeline?.allowNewEvent == false;
 
   bool get selectMode => selectedEvents.isNotEmpty;
 
@@ -211,16 +209,14 @@ class ChatController extends State<ChatPageWithRoom>
       return;
     }
     if (!scrollController.hasClients) return;
-    if (timeline?.allowNewEvent == false ||
-        scrollController.position.pixels > 0 && _scrolledUp == false) {
+    if (timeline?.allowNewEvent == false || scrollController.position.pixels > 0 && _scrolledUp == false) {
       setState(() => _scrolledUp = true);
     } else if (scrollController.position.pixels <= 0 && _scrolledUp == true) {
       setState(() => _scrolledUp = false);
       setReadMarker();
     }
 
-    if (scrollController.position.pixels == 0 ||
-        scrollController.position.pixels == 64) {
+    if (scrollController.position.pixels == 0 || scrollController.position.pixels == 64) {
       requestFuture();
     }
   }
@@ -258,10 +254,7 @@ class ChatController extends State<ChatPageWithRoom>
       if (item is TextShareItem) room.sendTextEvent(item.value);
       if (item is ContentShareItem) room.sendEvent(item.value);
     }
-    final files = shareItems
-        .whereType<FileShareItem>()
-        .map((item) => item.value)
-        .toList();
+    final files = shareItems.whereType<FileShareItem>().map((item) => item.value).toList();
     if (files.isEmpty) return;
     showAdaptiveDialog(
       context: context,
@@ -427,8 +420,7 @@ class ChatController extends State<ChatPageWithRoom>
   }) async {
     await Matrix.of(context).client.roomsLoading;
     await Matrix.of(context).client.accountDataLoading;
-    if (eventContextId != null &&
-        (!eventContextId.isValidMatrixId || eventContextId.sigil != '\$')) {
+    if (eventContextId != null && (!eventContextId.isValidMatrixId || eventContextId.sigil != '\$')) {
       eventContextId = null;
     }
     try {
@@ -473,16 +465,15 @@ class ChatController extends State<ChatPageWithRoom>
     if (_scrolledUp) return;
     if (scrollUpBannerEventId != null) return;
 
-    if (eventId == null &&
-        !room.hasNewMessages &&
-        room.notificationCount == 0) {
+    if (eventId == null && !room.hasNewMessages && room.notificationCount == 0) {
       return;
     }
 
+    if (!mounted) return;
+
     // Do not send read markers when app is not in foreground
     if (kIsWeb && !Matrix.of(context).webHasFocus) return;
-    if (!kIsWeb &&
-        WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+    if (!kIsWeb && WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
       return;
     }
 
@@ -549,8 +540,7 @@ class ChatController extends State<ChatPageWithRoom>
     var parseCommands = true;
 
     final commandMatch = RegExp(r'^\/(\w+)').firstMatch(sendController.text);
-    if (commandMatch != null &&
-        !sendingClient.commands.keys.contains(commandMatch[1]!.toLowerCase())) {
+    if (commandMatch != null && !sendingClient.commands.keys.contains(commandMatch[1]!.toLowerCase())) {
       final l10n = L10n.of(context);
       final dialogResult = await showOkCancelAlertDialog(
         context: context,
@@ -603,10 +593,15 @@ class ChatController extends State<ChatPageWithRoom>
 
   void sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
+    final matrixFile = MatrixFile.fromMimeType(
+      bytes: image,
+      name: "Image from Clipboard",
+    );
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
-        files: [XFile.fromData(image)],
+        // files: [XFile.fromData(image)],
+        files: [XFile.fromData(image, name: "Image from Clipboard", mimeType: matrixFile.mimeType)],
         room: room,
         outerContext: context,
       ),
@@ -744,9 +739,7 @@ class ChatController extends State<ChatPageWithRoom>
   String _getSelectedEventString() {
     var copyString = '';
     if (selectedEvents.length == 1) {
-      return selectedEvents.first
-          .getDisplayEvent(timeline!)
-          .calcLocalizedBodyFallback(MatrixLocals(L10n.of(context)));
+      return selectedEvents.first.getDisplayEvent(timeline!).calcLocalizedBodyFallback(MatrixLocals(L10n.of(context)));
     }
     for (final event in selectedEvents) {
       if (copyString.isNotEmpty) copyString += '\n\n';
@@ -892,8 +885,7 @@ class ChatController extends State<ChatPageWithRoom>
     final clients = Matrix.of(context).currentBundle;
     for (final event in selectedEvents) {
       if (!event.status.isSent) return false;
-      if (event.canRedact == false &&
-          !(clients!.any((cl) => event.senderId == cl!.userID))) {
+      if (event.canRedact == false && !(clients!.any((cl) => event.senderId == cl!.userID))) {
         return false;
       }
     }
@@ -911,13 +903,10 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   bool get canEditSelectedEvents {
-    if (isArchived ||
-        selectedEvents.length != 1 ||
-        !selectedEvents.first.status.isSent) {
+    if (isArchived || selectedEvents.length != 1 || !selectedEvents.first.status.isSent) {
       return false;
     }
-    return currentRoomBundle
-        .any((cl) => selectedEvents.first.senderId == cl!.userID);
+    return currentRoomBundle.any((cl) => selectedEvents.first.senderId == cl!.userID);
   }
 
   void forwardEventsAction() async {
@@ -925,16 +914,12 @@ class ChatController extends State<ChatPageWithRoom>
     final timeline = this.timeline;
     if (timeline == null) return;
 
-    final forwardEvents = List<Event>.from(selectedEvents)
-        .map((event) => event.getDisplayEvent(timeline))
-        .toList();
+    final forwardEvents = List<Event>.from(selectedEvents).map((event) => event.getDisplayEvent(timeline)).toList();
 
     await showScaffoldDialog(
       context: context,
       builder: (context) => ShareScaffoldDialog(
-        items: forwardEvents
-            .map((event) => ContentShareItem(event.content))
-            .toList(),
+        items: forwardEvents.map((event) => ContentShareItem(event.content)).toList(),
       ),
     );
     if (!mounted) return;
@@ -946,9 +931,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (event.status.isError) {
       event.sendAgain();
     }
-    final allEditEvents = event
-        .aggregatedEvents(timeline!, RelationshipTypes.edit)
-        .where((e) => e.status.isError);
+    final allEditEvents = event.aggregatedEvents(timeline!, RelationshipTypes.edit).where((e) => e.status.isError);
     for (final e in allEditEvents) {
       e.sendAgain();
     }
@@ -967,22 +950,17 @@ class ChatController extends State<ChatPageWithRoom>
     String eventId, {
     bool highlightEvent = true,
   }) async {
-    final foundEvent =
-        timeline!.events.firstWhereOrNull((event) => event.eventId == eventId);
+    final foundEvent = timeline!.events.firstWhereOrNull((event) => event.eventId == eventId);
 
-    final eventIndex = foundEvent == null
-        ? -1
-        : timeline!.events
-            .filterByVisibleInGui(exceptionEventId: eventId)
-            .indexOf(foundEvent);
+    final eventIndex =
+        foundEvent == null ? -1 : timeline!.events.filterByVisibleInGui(exceptionEventId: eventId).indexOf(foundEvent);
 
     if (eventIndex == -1) {
       setState(() {
         timeline = null;
         _scrolledUp = false;
         loadTimelineFuture = _getTimeline(eventContextId: eventId).onError(
-          ErrorReporter(context, 'Unable to load timeline after scroll to ID')
-              .onErrorCallback,
+          ErrorReporter(context, 'Unable to load timeline after scroll to ID').onErrorCallback,
         );
       });
       await loadTimelineFuture;
@@ -1010,8 +988,7 @@ class ChatController extends State<ChatPageWithRoom>
         timeline = null;
         _scrolledUp = false;
         loadTimelineFuture = _getTimeline().onError(
-          ErrorReporter(context, 'Unable to load timeline after scroll down')
-              .onErrorCallback,
+          ErrorReporter(context, 'Unable to load timeline after scroll down').onErrorCallback,
         );
       });
       await loadTimelineFuture;
@@ -1028,9 +1005,8 @@ class ChatController extends State<ChatPageWithRoom>
     if (emoji == null) return;
     final text = sendController.text;
     final selection = sendController.selection;
-    final newText = sendController.text.isEmpty
-        ? emoji.emoji
-        : text.replaceRange(selection.start, selection.end, emoji.emoji);
+    final newText =
+        sendController.text.isEmpty ? emoji.emoji : text.replaceRange(selection.start, selection.end, emoji.emoji);
     sendController.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(
@@ -1071,29 +1047,22 @@ class ChatController extends State<ChatPageWithRoom>
     setState(() {
       pendingText = sendController.text;
       editEvent = selectedEvents.first;
-      sendController.text =
-          editEvent!.getDisplayEvent(timeline!).calcLocalizedBodyFallback(
-                MatrixLocals(L10n.of(context)),
-                withSenderNamePrefix: false,
-                hideReply: true,
-              );
+      sendController.text = editEvent!.getDisplayEvent(timeline!).calcLocalizedBodyFallback(
+            MatrixLocals(L10n.of(context)),
+            withSenderNamePrefix: false,
+            hideReply: true,
+          );
       selectedEvents.clear();
     });
     inputFocus.requestFocus();
   }
 
   void goToNewRoomAction() async {
-    final newRoomId = room
-        .getState(EventTypes.RoomTombstone)!
-        .parsedTombstoneContent
-        .replacementRoom;
+    final newRoomId = room.getState(EventTypes.RoomTombstone)!.parsedTombstoneContent.replacementRoom;
     final result = await showFutureLoadingDialog(
       context: context,
       future: () => room.client.joinRoom(
-        room
-            .getState(EventTypes.RoomTombstone)!
-            .parsedTombstoneContent
-            .replacementRoom,
+        room.getState(EventTypes.RoomTombstone)!.parsedTombstoneContent.replacementRoom,
         via: [newRoomId.domain!],
       ),
     );
@@ -1179,8 +1148,7 @@ class ChatController extends State<ChatPageWithRoom>
       cancelLabel: L10n.of(context).cancel,
     );
     if (response == OkCancelResult.ok) {
-      final events = room.pinnedEventIds
-        ..removeWhere((oldEvent) => oldEvent == eventId);
+      final events = room.pinnedEventIds..removeWhere((oldEvent) => oldEvent == eventId);
       showFutureLoadingDialog(
         context: context,
         future: () => room.setPinnedEvents(events),
@@ -1191,8 +1159,7 @@ class ChatController extends State<ChatPageWithRoom>
   void pinEvent() {
     final pinnedEventIds = room.pinnedEventIds;
     final selectedEventIds = selectedEvents.map((e) => e.eventId).toSet();
-    final unpin = selectedEventIds.length == 1 &&
-        pinnedEventIds.contains(selectedEventIds.single);
+    final unpin = selectedEventIds.length == 1 && pinnedEventIds.contains(selectedEventIds.single);
     if (unpin) {
       pinnedEventIds.removeWhere(selectedEventIds.contains);
     } else {
@@ -1223,8 +1190,7 @@ class ChatController extends State<ChatPageWithRoom>
       final clients = currentRoomBundle;
       for (final client in clients) {
         final prefix = client!.sendPrefix;
-        if ((prefix.isNotEmpty) &&
-            text.toLowerCase() == '${prefix.toLowerCase()} ') {
+        if ((prefix.isNotEmpty) && text.toLowerCase() == '${prefix.toLowerCase()} ') {
           setSendingClient(client);
           setState(() {
             sendController.clear();
@@ -1256,11 +1222,9 @@ class ChatController extends State<ChatPageWithRoom>
 
   bool _inputTextIsEmpty = true;
 
-  bool get isArchived =>
-      {Membership.leave, Membership.ban}.contains(room.membership);
+  bool get isArchived => {Membership.leave, Membership.ban}.contains(room.membership);
 
-  void showEventInfo([Event? event]) =>
-      (event ?? selectedEvents.single).showInfoDialog(context);
+  void showEventInfo([Event? event]) => (event ?? selectedEvents.single).showInfoDialog(context);
 
   void onPhoneButtonTap() async {
     // VoIP required Android SDK 21
@@ -1336,33 +1300,32 @@ class ChatController extends State<ChatPageWithRoom>
         ),
         ValueListenableBuilder(
           valueListenable: _displayChatDetailsColumn,
-          builder: (context, displayChatDetailsColumn, _) =>
-              !FluffyThemes.isThreeColumnMode(context) ||
-                      room.membership != Membership.join ||
-                      !displayChatDetailsColumn
-                  ? const SizedBox(
-                      height: double.infinity,
-                      width: 0,
-                    )
-                  : Container(
-                      width: FluffyThemes.columnWidth,
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          left: BorderSide(
-                            width: 1,
-                            color: theme.dividerColor,
-                          ),
-                        ),
-                      ),
-                      child: ChatDetails(
-                        roomId: roomId,
-                        embeddedCloseButton: IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: toggleDisplayChatDetailsColumn,
-                        ),
+          builder: (context, displayChatDetailsColumn, _) => !FluffyThemes.isThreeColumnMode(context) ||
+                  room.membership != Membership.join ||
+                  !displayChatDetailsColumn
+              ? const SizedBox(
+                  height: double.infinity,
+                  width: 0,
+                )
+              : Container(
+                  width: FluffyThemes.columnWidth,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        width: 1,
+                        color: theme.dividerColor,
                       ),
                     ),
+                  ),
+                  child: ChatDetails(
+                    roomId: roomId,
+                    embeddedCloseButton: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: toggleDisplayChatDetailsColumn,
+                    ),
+                  ),
+                ),
         ),
       ],
     );

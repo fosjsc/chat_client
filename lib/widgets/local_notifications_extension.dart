@@ -19,26 +19,23 @@ import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 
 extension LocalNotificationsExtension on MatrixState {
-  static final html.AudioElement _audioPlayer = html.AudioElement()
-    ..src = 'assets/assets/sounds/notification.ogg'
-    ..load();
+  // static final html.AudioElement _audioPlayer = html.AudioElement()
+  //   ..src = 'assets/assets/sounds/notification.ogg'
+  //   ..load();
 
   void showLocalNotification(Event event) async {
     final roomId = event.room.id;
     if (activeRoomId == roomId) {
       if (kIsWeb && webHasFocus) return;
-      if (PlatformInfos.isDesktop &&
-          WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+      if (PlatformInfos.isDesktop && WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
         return;
       }
     }
 
-    final title =
-        event.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
+    final title = event.room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)));
     final body = await event.calcLocalizedBody(
       MatrixLocals(L10n.of(context)),
-      withSenderNamePrefix: !event.room.isDirectChat ||
-          event.room.lastEvent?.senderId == client.userID,
+      withSenderNamePrefix: !event.room.isDirectChat || event.room.lastEvent?.senderId == client.userID,
       plaintextBody: true,
       hideReply: true,
       hideEdit: true,
@@ -61,8 +58,7 @@ extension LocalNotificationsExtension on MatrixState {
           isThumbnail: true,
         );
 
-        thumbnailUri =
-            await event.senderFromMemoryOrFallback.avatarUrl?.getThumbnailUri(
+        thumbnailUri = await event.senderFromMemoryOrFallback.avatarUrl?.getThumbnailUri(
           client,
           width: size,
           height: size,
@@ -70,7 +66,7 @@ extension LocalNotificationsExtension on MatrixState {
         );
       }
 
-      _audioPlayer.play();
+      // _audioPlayer.play();
 
       html.Notification(
         title,
@@ -127,8 +123,7 @@ extension LocalNotificationsExtension on MatrixState {
         hints: hints,
       );
       notification.action.then((actionStr) {
-        var action = DesktopNotificationActions.values
-            .singleWhereOrNull((a) => a.name == actionStr);
+        var action = DesktopNotificationActions.values.singleWhereOrNull((a) => a.name == actionStr);
         if (action == null && actionStr == "default") {
           action = DesktopNotificationActions.openChat;
         }

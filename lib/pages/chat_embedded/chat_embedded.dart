@@ -544,6 +544,8 @@ class ChatEmbeddedController extends State<ChatPageWithRoom> with WidgetsBinding
       return;
     }
 
+    if (!mounted) return;
+
     // Do not send read markers when app is not in foreground
     if (kIsWeb && !Matrix.of(context).webHasFocus) return;
     if (!kIsWeb && WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
@@ -666,10 +668,15 @@ class ChatEmbeddedController extends State<ChatPageWithRoom> with WidgetsBinding
 
   void sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
+    final matrixFile = MatrixFile.fromMimeType(
+      bytes: image,
+      name: "Image from Clipboard",
+    );
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
-        files: [XFile.fromData(image)],
+        // files: [XFile.fromData(image)],
+        files: [XFile.fromData(image, name: "Image from Clipboard", mimeType: matrixFile.mimeType)],
         room: room,
         outerContext: context,
       ),

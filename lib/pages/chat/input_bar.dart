@@ -1,10 +1,12 @@
 import 'package:fluffychat/config/setting_keys.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:emojis/emoji.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:matrix/matrix.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:slugify/slugify.dart';
 
 import 'package:fluffychat/l10n/l10n.dart';
@@ -47,13 +49,11 @@ class InputBar extends StatelessWidget {
   });
 
   List<Map<String, String?>> getSuggestions(String text) {
-    if (controller!.selection.baseOffset !=
-            controller!.selection.extentOffset ||
+    if (controller!.selection.baseOffset != controller!.selection.extentOffset ||
         controller!.selection.baseOffset < 0) {
       return []; // no entries if there is selected text
     }
-    final searchText =
-        controller!.text.substring(0, controller!.selection.baseOffset);
+    final searchText = controller!.text.substring(0, controller!.selection.baseOffset);
     final ret = <Map<String, String?>>[];
     const maxResults = 30;
 
@@ -71,8 +71,7 @@ class InputBar extends StatelessWidget {
         if (ret.length > maxResults) return ret;
       }
     }
-    final emojiMatch =
-        RegExp(r'(?:\s|^):(?:([-\w]+)~)?([-\w]+)$').firstMatch(searchText);
+    final emojiMatch = RegExp(r'(?:\s|^):(?:([-\w]+)~)?([-\w]+)$').firstMatch(searchText);
     if (emojiMatch != null) {
       final packSearch = emojiMatch[1];
       final emoteSearch = emojiMatch[2]!.toLowerCase();
@@ -105,10 +104,8 @@ class InputBar extends StatelessWidget {
               'type': 'emote',
               'name': emote.key,
               'pack': packSearch,
-              'pack_avatar_url':
-                  emotePacks[packSearch]!.pack.avatarUrl?.toString(),
-              'pack_display_name':
-                  emotePacks[packSearch]!.pack.displayName ?? packSearch,
+              'pack_avatar_url': emotePacks[packSearch]!.pack.avatarUrl?.toString(),
+              'pack_display_name': emotePacks[packSearch]!.pack.displayName ?? packSearch,
               'mxc': emote.value.url.toString(),
             });
           }
@@ -120,8 +117,8 @@ class InputBar extends StatelessWidget {
       // aside of emote packs, also propose normal (tm) unicode emojis
       final matchingUnicodeEmojis = Emoji.all()
           .where(
-            (element) => [element.name, ...element.keywords]
-                .any((element) => element.toLowerCase().contains(emoteSearch)),
+            (element) =>
+                [element.name, ...element.keywords].any((element) => element.toLowerCase().contains(emoteSearch)),
           )
           .toList();
       // sort by the index of the search term in the name in order to have
@@ -159,8 +156,7 @@ class InputBar extends StatelessWidget {
       for (final user in room.getParticipants()) {
         if ((user.displayName != null &&
                 (user.displayName!.toLowerCase().contains(userSearch) ||
-                    slugify(user.displayName!.toLowerCase())
-                        .contains(userSearch))) ||
+                    slugify(user.displayName!.toLowerCase()).contains(userSearch))) ||
             user.id.split(':')[0].toLowerCase().contains(userSearch)) {
           ret.add({
             'type': 'user',
@@ -185,19 +181,10 @@ class InputBar extends StatelessWidget {
         final state = r.getState(EventTypes.RoomCanonicalAlias);
         if ((state != null &&
                 ((state.content['alias'] is String &&
-                        state.content
-                            .tryGet<String>('alias')!
-                            .split(':')[0]
-                            .toLowerCase()
-                            .contains(roomSearch)) ||
+                        state.content.tryGet<String>('alias')!.split(':')[0].toLowerCase().contains(roomSearch)) ||
                     (state.content['alt_aliases'] is List &&
                         (state.content['alt_aliases'] as List).any(
-                          (l) =>
-                              l is String &&
-                              l
-                                  .split(':')[0]
-                                  .toLowerCase()
-                                  .contains(roomSearch),
+                          (l) => l is String && l.split(':')[0].toLowerCase().contains(roomSearch),
                         )))) ||
             (r.name.toLowerCase().contains(roomSearch))) {
           ret.add({
@@ -269,9 +256,7 @@ class InputBar extends StatelessWidget {
             MxcImage(
               // ensure proper ordering ...
               key: ValueKey(suggestion['name']),
-              uri: suggestion['mxc'] is String
-                  ? Uri.parse(suggestion['mxc'] ?? '')
-                  : null,
+              uri: suggestion['mxc'] is String ? Uri.parse(suggestion['mxc'] ?? '') : null,
               width: size,
               height: size,
               isThumbnail: false,
@@ -309,8 +294,7 @@ class InputBar extends StatelessWidget {
           children: <Widget>[
             Avatar(
               mxContent: url,
-              name: suggestion.tryGet<String>('displayname') ??
-                  suggestion.tryGet<String>('mxid'),
+              name: suggestion.tryGet<String>('displayname') ?? suggestion.tryGet<String>('mxid'),
               size: size,
               client: client,
             ),
@@ -324,12 +308,10 @@ class InputBar extends StatelessWidget {
   }
 
   void insertSuggestion(_, Map<String, String?> suggestion) {
-    final replaceText =
-        controller!.text.substring(0, controller!.selection.baseOffset);
+    final replaceText = controller!.text.substring(0, controller!.selection.baseOffset);
     var startText = '';
-    final afterText = replaceText == controller!.text
-        ? ''
-        : controller!.text.substring(controller!.selection.baseOffset + 1);
+    final afterText =
+        replaceText == controller!.text ? '' : controller!.text.substring(controller!.selection.baseOffset + 1);
     var insertText = '';
     if (suggestion['type'] == 'command') {
       insertText = '${suggestion['name']!} ';
@@ -395,70 +377,101 @@ class InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TypeAheadField<Map<String, String?>>(
-      direction: VerticalDirection.up,
-      hideOnEmpty: true,
-      hideOnLoading: true,
-      controller: controller,
-      focusNode: focusNode,
-      hideOnSelect: false,
-      debounceDuration: const Duration(milliseconds: 50),
-      // show suggestions after 50ms idle time (default is 300)
-      builder: (context, controller, focusNode) => TextField(
-        controller: controller,
-        focusNode: focusNode,
-        readOnly: readOnly,
-        contextMenuBuilder: (c, e) => markdownContextBuilder(c, e, controller),
-        contentInsertionConfiguration: ContentInsertionConfiguration(
-          onContentInserted: (KeyboardInsertedContent content) {
-            final data = content.data;
-            if (data == null) return;
+    final useShortCuts = (PlatformInfos.isWeb);
+    return Shortcuts(
+      shortcuts: !useShortCuts
+          ? {}
+          : {
+              const SingleActivator(LogicalKeyboardKey.keyV, meta: true): PasteIntent(),
+              const SingleActivator(LogicalKeyboardKey.keyV, control: true): PasteIntent()
+            },
+      child: Actions(
+        actions: !useShortCuts
+            ? {}
+            : <Type, Action<Intent>>{
+                PasteIntent: CallbackAction(
+                  onInvoke: (intent) async {
+                    final image = await Pasteboard.image;
+                    if (image != null) {
+                      onSubmitImage!(image);
+                      return null;
+                    }
 
-            final file = MatrixFile(
-              mimeType: content.mimeType,
-              bytes: data,
-              name: content.uri.split('/').last,
-            );
-            room.sendFileEvent(
-              file,
-              shrinkImageMaxDimension: 1600,
+                    final text = await Pasteboard.text;
+                    if (text != null) {
+                      controller?.text += text;
+
+                      return null;
+                    }
+
+                    return null;
+                  },
+                )
+              },
+        child: TypeAheadField<Map<String, String?>>(
+          direction: VerticalDirection.up,
+          hideOnEmpty: true,
+          hideOnLoading: true,
+          controller: controller,
+          focusNode: focusNode,
+          hideOnSelect: false,
+          debounceDuration: const Duration(milliseconds: 50),
+          // show suggestions after 50ms idle time (default is 300)
+          builder: (context, controller, focusNode) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              readOnly: readOnly,
+              contextMenuBuilder: (c, e) => markdownContextBuilder(c, e, controller),
+              // contentInsertionConfiguration: ContentInsertionConfiguration(
+              //   onContentInserted: (KeyboardInsertedContent content) {
+              //     final data = content.data;
+              //     if (data == null) return;
+              //     final file = MatrixFile(
+              //       mimeType: content.mimeType,
+              //       bytes: data,
+              //       name: content.uri.split('/').last,
+              //     );
+              //     room.sendFileEvent(
+              //       file,
+              //       shrinkImageMaxDimension: 1600,
+              //     );
+              //   },
+              // ),
+              minLines: minLines,
+              maxLines: maxLines,
+              keyboardType: keyboardType!,
+              textInputAction: textInputAction,
+              autofocus: autofocus!,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter((maxPDUSize / 3).floor()),
+              ],
+              onSubmitted: (text) {
+                // fix for library for now
+                // it sets the types for the callback incorrectly
+                onSubmitted!(text);
+              },
+              maxLength: AppSettings.textMessageMaxLength.getItem(Matrix.of(context).store),
+              decoration: decoration,
+              onChanged: (text) {
+                // fix for the library for now
+                // it sets the types for the callback incorrectly
+                onChanged!(text);
+              },
+              textCapitalization: TextCapitalization.sentences,
             );
           },
+          suggestionsCallback: getSuggestions,
+          itemBuilder: (c, s) => buildSuggestion(c, s, Matrix.of(context).client),
+          onSelected: (Map<String, String?> suggestion) => insertSuggestion(context, suggestion),
+          errorBuilder: (BuildContext context, Object? error) => const SizedBox.shrink(),
+          loadingBuilder: (BuildContext context) => const SizedBox.shrink(),
+          // fix loading briefly flickering a dark box
+          emptyBuilder: (BuildContext context) => const SizedBox.shrink(), // fix loading briefly showing no suggestions
         ),
-        minLines: minLines,
-        maxLines: maxLines,
-        keyboardType: keyboardType!,
-        textInputAction: textInputAction,
-        autofocus: autofocus!,
-        inputFormatters: [
-          LengthLimitingTextInputFormatter((maxPDUSize / 3).floor()),
-        ],
-        onSubmitted: (text) {
-          // fix for library for now
-          // it sets the types for the callback incorrectly
-          onSubmitted!(text);
-        },
-        maxLength:
-            AppSettings.textMessageMaxLength.getItem(Matrix.of(context).store),
-        decoration: decoration,
-        onChanged: (text) {
-          // fix for the library for now
-          // it sets the types for the callback incorrectly
-          onChanged!(text);
-        },
-        textCapitalization: TextCapitalization.sentences,
       ),
-
-      suggestionsCallback: getSuggestions,
-      itemBuilder: (c, s) => buildSuggestion(c, s, Matrix.of(context).client),
-      onSelected: (Map<String, String?> suggestion) =>
-          insertSuggestion(context, suggestion),
-      errorBuilder: (BuildContext context, Object? error) =>
-          const SizedBox.shrink(),
-      loadingBuilder: (BuildContext context) => const SizedBox.shrink(),
-      // fix loading briefly flickering a dark box
-      emptyBuilder: (BuildContext context) =>
-          const SizedBox.shrink(), // fix loading briefly showing no suggestions
     );
   }
 }
+
+class PasteIntent extends Intent {}

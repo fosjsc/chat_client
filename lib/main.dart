@@ -29,7 +29,8 @@ void main() async {
   // If the app starts in detached mode, we assume that it is in
   // background fetch mode for processing push notifications. This is
   // currently only supported on Android.
-  if (PlatformInfos.isAndroid && AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
+  if (PlatformInfos.isAndroid &&
+      AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState) {
     // Do not send online presences when app is in background fetch mode.
     for (final client in clients) {
       client.backgroundSync = false;
@@ -60,7 +61,8 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
   String? pin;
   if (PlatformInfos.isMobile) {
     try {
-      pin = await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
+      pin =
+          await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
     } catch (e, s) {
       Logs().d('Unable to read PIN from Secure storage', e, s);
     }
@@ -79,6 +81,15 @@ Future<void> startGui(List<Client> clients, SharedPreferences store) async {
         if (data != null) {
           AppConfig.setHomeserver(data['homeserver_url']);
           AppConfig.setFontSizeFactor(data?['fontSizeFactor']);
+        }
+
+        if (clients.length > 1) {
+          for (final client in clients) {
+            if (client.userID != null && client.userID != data?['username']) {
+              client.backgroundSync = false;
+              client.syncPresence = PresenceType.offline;
+            }
+          }
         }
 
         return FluffyChatApp(

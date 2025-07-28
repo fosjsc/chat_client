@@ -136,7 +136,12 @@ class MessageContent extends StatelessWidget {
                 height = maxSize;
                 width = max(32, maxSize * (w / h));
               }
+            } else if (event.messageType == MessageTypes.Image &&
+                w == null &&
+                h == null) {
+              fit = BoxFit.contain;
             }
+
             return ImageBubble(
               event,
               width: width,

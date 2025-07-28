@@ -603,10 +603,22 @@ class ChatController extends State<ChatPageWithRoom>
 
   void sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
+
+    final matrixFile = MatrixFile.fromMimeType(
+      bytes: image,
+      name: "Image from Clipboard",
+    );
+
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
-        files: [XFile.fromData(image)],
+        files: [
+          XFile.fromData(
+            matrixFile.bytes,
+            name: "Image from Clipboard",
+            mimeType: matrixFile.mimeType,
+          ),
+        ],
         room: room,
         outerContext: context,
       ),

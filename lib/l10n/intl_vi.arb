@@ -769,7 +769,7 @@
     "type": "String",
     "placeholders": {}
   },
-  "sendTypingNotifications": "Gửi thông báo đang gõ",
+  "sendTypingNotifications": "Gửi thông báo đang nhắn tin",
   "@sendTypingNotifications": {},
   "swipeRightToLeftToReply": "Vuốt từ phải sang trái để trả lời",
   "@swipeRightToLeftToReply": {},
@@ -1308,7 +1308,7 @@
   "noPermission": "Không có quyền",
   "noRoomsFound": "Không tìm thấy phòng nào...",
   "notificationsEnabledForThisAccount": "Thông báo được bật cho tài khoản này",
-  "numUsersTyping": "{count} người dùng đang gõ...",
+  "numUsersTyping": "{count} người dùng đang nhắn tin...",
   "@numUsersTyping": {
     "type": "String",
     "placeholders": {
@@ -1575,7 +1575,7 @@
   "unmuteChat": "Bỏ tắt tiếng cuộc trò chuyện",
   "unpin": "Bỏ ghim",
   "unreadChats": "Cuộc trò chuyện chưa đọc",
-  "userAndOthersAreTyping": "{username} và {count} người khác đang gõ...",
+  "userAndOthersAreTyping": "{username} và {count} người khác đang nhắn tin...",
   "@userAndOthersAreTyping": {
     "type": "String",
     "placeholders": {
@@ -1587,7 +1587,7 @@
       }
     }
   },
-  "userAndUserAreTyping": "{username} và {username2} đang gõ...",
+  "userAndUserAreTyping": "{username} và {username2} đang nhắn tin...",
   "@userAndUserAreTyping": {
     "type": "String",
     "placeholders": {
@@ -1599,7 +1599,7 @@
       }
     }
   },
-  "userIsTyping": "{username} đang gõ...",
+  "userIsTyping": "{username} đang nhắn tin...",
   "@userIsTyping": {
     "type": "String",
     "placeholders": {
@@ -1928,7 +1928,7 @@
   "restoreSessionBody": "Bạn có muốn khôi phục phiên trước đó không?",
   "forwardMessageTo": "Chuyển tiếp tin nhắn đến...",
   "sendReadReceipts": "Gửi thông báo đã đọc",
-  "sendTypingNotificationsDescription": "Người dùng khác có thể thấy bạn đang gõ",
+  "sendTypingNotificationsDescription": "Người dùng khác có thể thấy bạn đang nhắn tin",
   "sendReadReceiptsDescription": "Người dùng khác có thể thấy bạn đã đọc tin nhắn của họ",
   "formattedMessages": "Tin nhắn được định dạng",
   "formattedMessagesDescription": "Markdown và HTML được hiển thị chính xác trong tin nhắn",

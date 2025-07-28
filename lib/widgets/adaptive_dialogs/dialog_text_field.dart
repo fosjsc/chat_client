@@ -78,6 +78,8 @@ class DialogTextField extends StatelessWidget {
               prefix: prefixText != null ? Text(prefixText) : null,
               suffix: suffixText != null ? Text(suffixText) : null,
               placeholder: labelText ?? hintText,
+              style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color),
             ),
             if (errorText != null)
               Text(

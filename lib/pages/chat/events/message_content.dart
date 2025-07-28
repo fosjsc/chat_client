@@ -116,17 +116,11 @@ class MessageContent extends StatelessWidget {
           case MessageTypes.Sticker:
             if (event.redacted) continue textmessage;
             const maxSize = 256.0;
-            final w = event.content
-                .tryGetMap<String, Object?>('info')
-                ?.tryGet<int>('w');
-            final h = event.content
-                .tryGetMap<String, Object?>('info')
-                ?.tryGet<int>('h');
+            final w = event.content.tryGetMap<String, Object?>('info')?.tryGet<int>('w');
+            final h = event.content.tryGetMap<String, Object?>('info')?.tryGet<int>('h');
             var width = maxSize;
-            var height = maxSize;
-            var fit = event.messageType == MessageTypes.Sticker
-                ? BoxFit.contain
-                : BoxFit.cover;
+            double? height = maxSize;
+            var fit = event.messageType == MessageTypes.Sticker ? BoxFit.contain : BoxFit.cover;
             if (w != null && h != null) {
               fit = BoxFit.contain;
               if (w > h) {
@@ -136,7 +130,10 @@ class MessageContent extends StatelessWidget {
                 height = maxSize;
                 width = max(32, maxSize * (w / h));
               }
+            } else if (event.messageType == MessageTypes.Image && w == null && h == null) {
+              fit = BoxFit.contain;
             }
+
             return ImageBubble(
               event,
               width: width,
@@ -149,9 +146,7 @@ class MessageContent extends StatelessWidget {
           case CuteEventContent.eventType:
             return CuteContent(event);
           case MessageTypes.Audio:
-            if (PlatformInfos.isMobile ||
-                    PlatformInfos.isMacOS ||
-                    PlatformInfos.isWeb
+            if (PlatformInfos.isMobile || PlatformInfos.isMacOS || PlatformInfos.isWeb
                 // Disabled until https://github.com/bleonard252/just_audio_mpv/issues/3
                 // is fixed
                 //   || PlatformInfos.isLinux
@@ -191,18 +186,10 @@ class MessageContent extends StatelessWidget {
               fontSize: fontSize,
             );
           case MessageTypes.Location:
-            final geoUri =
-                Uri.tryParse(event.content.tryGet<String>('geo_uri')!);
+            final geoUri = Uri.tryParse(event.content.tryGet<String>('geo_uri')!);
             if (geoUri != null && geoUri.scheme == 'geo') {
-              final latlong = geoUri.path
-                  .split(';')
-                  .first
-                  .split(',')
-                  .map((s) => double.tryParse(s))
-                  .toList();
-              if (latlong.length == 2 &&
-                  latlong.first != null &&
-                  latlong.last != null) {
+              final latlong = geoUri.path.split(';').first.split(',').map((s) => double.tryParse(s)).toList();
+              if (latlong.length == 2 && latlong.first != null && latlong.last != null) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -213,8 +200,7 @@ class MessageContent extends StatelessWidget {
                     const SizedBox(height: 6),
                     OutlinedButton.icon(
                       icon: Icon(Icons.location_on_outlined, color: textColor),
-                      onPressed:
-                          UrlLauncher(context, geoUri.toString()).launchUrl,
+                      onPressed: UrlLauncher(context, geoUri.toString()).launchUrl,
                       label: Text(
                         L10n.of(context).openInMaps,
                         style: TextStyle(color: textColor),
@@ -235,8 +221,7 @@ class MessageContent extends StatelessWidget {
               return FutureBuilder<User?>(
                 future: event.redactedBecause?.fetchSenderUser(),
                 builder: (context, snapshot) {
-                  final reason =
-                      event.redactedBecause?.content.tryGet<String>('reason');
+                  final reason = event.redactedBecause?.content.tryGet<String>('reason');
                   final redactedBy = snapshot.data?.calcDisplayname() ??
                       event.redactedBecause?.senderId.localpart ??
                       L10n.of(context).user;
@@ -255,16 +240,12 @@ class MessageContent extends StatelessWidget {
                 },
               );
             }
-            var html = AppConfig.renderHtml && event.isRichMessage
-                ? event.formattedText
-                : event.body;
+            var html = AppConfig.renderHtml && event.isRichMessage ? event.formattedText : event.body;
             if (event.messageType == MessageTypes.Emote) {
               html = '* $html';
             }
 
-            final bigEmotes = event.onlyEmotes &&
-                event.numberEmotes > 0 &&
-                event.numberEmotes <= 3;
+            final bigEmotes = event.onlyEmotes && event.numberEmotes > 0 && event.numberEmotes <= 3;
             return Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -274,14 +255,11 @@ class MessageContent extends StatelessWidget {
                 html: html,
                 textColor: textColor,
                 room: event.room,
-                fontSize: AppConfig.fontSizeFactor *
-                    AppConfig.messageFontSize *
-                    (bigEmotes ? 5 : 1),
+                fontSize: AppConfig.fontSizeFactor * AppConfig.messageFontSize * (bigEmotes ? 5 : 1),
                 limitHeight: !selected,
                 linkStyle: TextStyle(
                   color: linkColor,
-                  fontSize:
-                      AppConfig.fontSizeFactor * AppConfig.messageFontSize,
+                  fontSize: AppConfig.fontSizeFactor * AppConfig.messageFontSize,
                   decoration: TextDecoration.underline,
                   decorationColor: linkColor,
                 ),
@@ -300,8 +278,7 @@ class MessageContent extends StatelessWidget {
           builder: (context, snapshot) {
             return _ButtonContent(
               label: L10n.of(context).startedACall(
-                snapshot.data?.calcDisplayname() ??
-                    event.senderFromMemoryOrFallback.calcDisplayname(),
+                snapshot.data?.calcDisplayname() ?? event.senderFromMemoryOrFallback.calcDisplayname(),
               ),
               icon: '📞',
               textColor: buttonTextColor,
@@ -316,8 +293,7 @@ class MessageContent extends StatelessWidget {
           builder: (context, snapshot) {
             return _ButtonContent(
               label: L10n.of(context).userSentUnknownEvent(
-                snapshot.data?.calcDisplayname() ??
-                    event.senderFromMemoryOrFallback.calcDisplayname(),
+                snapshot.data?.calcDisplayname() ?? event.senderFromMemoryOrFallback.calcDisplayname(),
                 event.type,
               ),
               icon: 'ℹ️',

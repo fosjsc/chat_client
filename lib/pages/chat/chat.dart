@@ -597,11 +597,12 @@ class ChatController extends State<ChatPageWithRoom> with WidgetsBindingObserver
       bytes: image,
       name: "Image from Clipboard",
     );
+
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         // files: [XFile.fromData(image)],
-        files: [XFile.fromData(image, name: "Image from Clipboard", mimeType: matrixFile.mimeType)],
+        files: [XFile.fromData(matrixFile.bytes, name: "Image from Clipboard", mimeType: matrixFile.mimeType)],
         room: room,
         outerContext: context,
       ),

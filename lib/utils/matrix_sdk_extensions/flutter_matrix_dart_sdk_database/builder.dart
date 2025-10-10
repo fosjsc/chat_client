@@ -64,7 +64,7 @@ Future<MatrixSdkDatabase> _constructDatabase(String clientName) async {
     return await MatrixSdkDatabase.init(clientName);
   }
 
-  final cipher = await getDatabaseCipher();
+  // final cipher = await getDatabaseCipher();
 
   Directory? fileStorageLocation;
   try {
@@ -91,23 +91,23 @@ Future<MatrixSdkDatabase> _constructDatabase(String clientName) async {
 
   // in case we got a cipher, we use the encryption helper
   // to manage SQLite encryption
-  final helper = cipher == null
-      ? null
-      : SQfLiteEncryptionHelper(
-          factory: factory,
-          path: path,
-          cipher: cipher,
-        );
+  // final helper = cipher == null
+  //     ? null
+  //     : SQfLiteEncryptionHelper(
+  //         factory: factory,
+  //         path: path,
+  //         cipher: cipher,
+  //       );
 
   // check whether the DB is already encrypted and otherwise do so
-  await helper?.ensureDatabaseFileEncrypted();
+  // await helper?.ensureDatabaseFileEncrypted();
 
   final database = await factory.openDatabase(
     path,
     options: OpenDatabaseOptions(
       version: 1,
       // most important : apply encryption when opening the DB
-      onConfigure: helper?.applyPragmaKey,
+      // onConfigure: helper?.applyPragmaKey,
     ),
   );
 

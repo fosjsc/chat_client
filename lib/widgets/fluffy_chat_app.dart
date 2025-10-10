@@ -14,17 +14,17 @@ import '../utils/custom_scroll_behaviour.dart';
 import 'matrix.dart';
 
 class FluffyChatApp extends StatelessWidget {
-  final Widget? testWidget;
-  final List<Client> clients;
-  final String? pincode;
-  final SharedPreferences store;
+  // final Widget? testWidget;
+  // final List<Client> clients;
+  // final String? pincode;
+  // final SharedPreferences store;
 
   const FluffyChatApp({
     super.key,
-    this.testWidget,
-    required this.clients,
-    required this.store,
-    this.pincode,
+    // this.testWidget,
+    // required this.clients,
+    // required this.store,
+    // this.pincode,
   });
 
   /// getInitialLink may rereturn the value multiple times if this view is
@@ -52,17 +52,17 @@ class FluffyChatApp extends StatelessWidget {
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
         routerConfig: router,
-        builder: (context, child) => AppLockWidget(
-          pincode: pincode,
-          clients: clients,
-          // Need a navigator above the Matrix widget for
-          // displaying dialogs
-          child: Matrix(
-            clients: clients,
-            store: store,
-            child: testWidget ?? child,
-          ),
-        ),
+        // builder: (context, child) => AppLockWidget(
+        //   pincode: pincode,
+        //   clients: clients,
+        //   // Need a navigator above the Matrix widget for
+        //   // displaying dialogs
+        //   child: Matrix(
+        //     clients: clients,
+        //     store: store,
+        //     child: testWidget ?? child,
+        //   ),
+        // ),
       ),
     );
   }

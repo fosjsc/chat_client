@@ -26,6 +26,7 @@ class UserDialog extends StatelessWidget {
       showAdaptiveDialog(
         context: context,
         barrierDismissible: true,
+        useRootNavigator: false,
         builder: (context) => UserDialog(
           profile,
           noProfileWarning: noProfileWarning,
@@ -56,7 +57,7 @@ class UserDialog extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 256, maxHeight: 256),
         child: PresenceBuilder(
           userId: profile.userId,
-          client: Matrix.of(context).client,
+          client: client,
           builder: (context, presence) {
             if (presence == null) return const SizedBox.shrink();
             final statusMsg = presence.statusMsg;

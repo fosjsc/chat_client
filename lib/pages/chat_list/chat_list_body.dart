@@ -109,17 +109,19 @@ class ChatListViewBody extends StatelessWidget {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: userSearchResult.results.length,
                                 itemBuilder: (context, i) => _SearchItem(
-                                  title:
-                                      userSearchResult.results[i].displayName ??
-                                          userSearchResult
-                                              .results[i].userId.localpart ??
-                                          L10n.of(context).unknownDevice,
-                                  avatar: userSearchResult.results[i].avatarUrl,
-                                  onPressed: () => UserDialog.show(
-                                    context: context,
-                                    profile: userSearchResult.results[i],
-                                  ),
-                                ),
+                                    title: userSearchResult
+                                            .results[i].displayName ??
+                                        userSearchResult
+                                            .results[i].userId.localpart ??
+                                        L10n.of(context).unknownDevice,
+                                    avatar:
+                                        userSearchResult.results[i].avatarUrl,
+                                    onPressed: () {
+                                      UserDialog.show(
+                                        context: context,
+                                        profile: userSearchResult.results[i],
+                                      );
+                                    }),
                               ),
                       ),
                     ],

@@ -56,7 +56,7 @@ abstract class AppRoutes {
           ? null
           : '/home';
 
-  AppRoutes();
+  const AppRoutes();
 
   static final List<RouteBase> routes = [
     GoRoute(

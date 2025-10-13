@@ -128,7 +128,7 @@ abstract class AppConfig {
     password = password;
   }
 
-  Future<void> checkHomeServerAction(BuildContext context) async {
+  static Future<void> checkHomeServerAction(BuildContext context) async {
     final homeServer = AppConfig.defaultHomeserver;
     final homeServerInput = homeServer.toLowerCase().replaceAll(' ', '-');
 

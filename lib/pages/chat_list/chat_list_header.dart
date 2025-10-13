@@ -1,3 +1,4 @@
+import 'package:fluffychat/utils/app_bridge.dart';
 import 'package:flutter/material.dart';
 
 import 'package:matrix/matrix.dart';
@@ -25,6 +26,9 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
     final client = Matrix.of(context).client;
 
     return SliverAppBar(
+      leading: BackButton(onPressed: () {
+        AppBridge.exitToMain();
+      }),
       floating: true,
       toolbarHeight: 72,
       pinned: FluffyThemes.isColumnMode(context),

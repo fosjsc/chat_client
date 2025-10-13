@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:matrix/matrix.dart';
@@ -7,8 +8,6 @@ import 'package:matrix/matrix.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
-import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
-import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import '../../utils/platform_infos.dart';
 import 'login_view.dart';
@@ -22,8 +21,11 @@ class Login extends StatefulWidget {
 }
 
 class LoginController extends State<Login> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController =
+      TextEditingController(text: AppConfig.username);
+  final TextEditingController passwordController = TextEditingController(
+    text: AppConfig.password,
+  );
   String? usernameError;
   String? passwordError;
   bool loading = false;
@@ -154,80 +156,6 @@ class LoginController extends State<Login> {
       widget.client.homeserver = oldHomeserver;
       usernameError = e.toLocalizedString(context);
       if (mounted) setState(() {});
-    }
-  }
-
-  void passwordForgotten() async {
-    final input = await showTextInputDialog(
-      useRootNavigator: false,
-      context: context,
-      title: L10n.of(context).passwordForgotten,
-      message: L10n.of(context).enterAnEmailAddress,
-      okLabel: L10n.of(context).ok,
-      cancelLabel: L10n.of(context).cancel,
-      initialText:
-          usernameController.text.isEmail ? usernameController.text : '',
-      hintText: L10n.of(context).enterAnEmailAddress,
-      keyboardType: TextInputType.emailAddress,
-    );
-    if (input == null) return;
-    final clientSecret = DateTime.now().millisecondsSinceEpoch.toString();
-    final response = await showFutureLoadingDialog(
-      context: context,
-      future: () => widget.client.requestTokenToResetPasswordEmail(
-        clientSecret,
-        input,
-        sendAttempt++,
-      ),
-    );
-    if (response.error != null) return;
-    final password = await showTextInputDialog(
-      useRootNavigator: false,
-      context: context,
-      title: L10n.of(context).passwordForgotten,
-      message: L10n.of(context).chooseAStrongPassword,
-      okLabel: L10n.of(context).ok,
-      cancelLabel: L10n.of(context).cancel,
-      hintText: '******',
-      obscureText: true,
-      minLines: 1,
-      maxLines: 1,
-    );
-    if (password == null) return;
-    final ok = await showOkAlertDialog(
-      useRootNavigator: false,
-      context: context,
-      title: L10n.of(context).weSentYouAnEmail,
-      message: L10n.of(context).pleaseClickOnLink,
-      okLabel: L10n.of(context).iHaveClickedOnLink,
-    );
-    if (ok != OkCancelResult.ok) return;
-    final data = <String, dynamic>{
-      'new_password': password,
-      'logout_devices': false,
-      "auth": AuthenticationThreePidCreds(
-        type: AuthenticationTypes.emailIdentity,
-        threepidCreds: ThreepidCreds(
-          sid: response.result!.sid,
-          clientSecret: clientSecret,
-        ),
-      ).toJson(),
-    };
-    final success = await showFutureLoadingDialog(
-      context: context,
-      future: () => widget.client.request(
-        RequestType.POST,
-        '/client/v3/account/password',
-        data: data,
-      ),
-    );
-    if (success.error == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(L10n.of(context).passwordHasBeenChanged)),
-      );
-      usernameController.text = input;
-      passwordController.text = password;
-      login();
     }
   }
 

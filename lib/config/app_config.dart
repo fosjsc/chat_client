@@ -1,15 +1,20 @@
 import 'dart:ui';
 
+import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 abstract class AppConfig {
-  static String _applicationName = 'FluffyChat';
+  static String _applicationName = 'fChat';
 
   static String get applicationName => _applicationName;
   static String? _applicationWelcomeMessage;
 
   static String? get applicationWelcomeMessage => _applicationWelcomeMessage;
-  static String _defaultHomeserver = 'matrix.org';
+  static String _defaultHomeserver = 'chat.fosjsc.com';
+  static String? username;
+  static String? password;
 
   static String get defaultHomeserver => _defaultHomeserver;
   static double fontSizeFactor = 1;
@@ -112,4 +117,63 @@ abstract class AppConfig {
       hideUnknownEvents = json['hide_unknown_events'];
     }
   }
+
+  static setInitData({
+    String? homeServer,
+    String? username,
+    String? password,
+  }) {
+    _defaultHomeserver = homeServer ?? _defaultHomeserver;
+    username = username;
+    password = password;
+  }
+
+  static Future<void> loginAction({
+    required String username,
+    required String password,
+    required BuildContext context,
+  }) async {
+    final matrix = Matrix.of(context);
+
+    if (username.isEmpty || password.isEmpty) {
+      return;
+    }
+
+    try {
+      AuthenticationIdentifier identifier;
+      if (username.isEmail) {
+        identifier = AuthenticationThirdPartyIdentifier(
+          medium: 'email',
+          address: username,
+        );
+      } else {
+        identifier = AuthenticationUserIdentifier(user: username);
+      }
+      final client = await matrix.getLoginClient();
+
+      await client.login(
+        LoginType.mLoginPassword,
+        identifier: identifier,
+        // To stay compatible with older server versions
+        // ignore: deprecated_member_use
+        user: identifier.type == AuthenticationIdentifierTypes.userId
+            ? username
+            : null,
+        password: password,
+        initialDeviceDisplayName: PlatformInfos.clientName,
+      );
+    } on MatrixException catch (exception) {
+      print('Auto Login MatrixException: ${exception.errorMessage}');
+      return;
+    } catch (exception) {
+      print('Auto Login Exception: $exception');
+      return;
+    }
+  }
+}
+
+extension on String {
+  static final RegExp _emailRegex = RegExp(r'(.+)@(.+)\.(.+)');
+
+  bool get isEmail => _emailRegex.hasMatch(this);
 }

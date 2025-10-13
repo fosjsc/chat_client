@@ -5,6 +5,19 @@ plugins {
     //id "com.google.gms.google-services"
 }
 
+// 🔧 Force the correct Tink Android version for UnifiedPush
+configurations.all {
+    // Use the latest version published: https://central.sonatype.com/artifact/com.google.crypto.tink/tink-android
+    def tink = "com.google.crypto.tink:tink-android:1.17.0"
+
+    resolutionStrategy {
+        force tink
+        dependencySubstitution {
+            substitute module("com.google.crypto.tink:tink") using module(tink)
+        }
+    }
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -30,7 +43,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     namespace = "chat.fluffy.fluffychat"
 
     sourceSets {
@@ -43,8 +56,8 @@ android {
 
     defaultConfig {
         applicationId "chat.fluffy.fluffychat"
-        minSdkVersion 21
-        targetSdkVersion 35
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

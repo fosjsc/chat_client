@@ -94,7 +94,7 @@ class BackgroundPush {
       if (Platform.isAndroid) {
         await UnifiedPush.initialize(
           onNewEndpoint: _newUpEndpoint,
-          onRegistrationFailed: _upUnregistered,
+          onRegistrationFailed: _upRegistrationFailed,
           onUnregistered: _upUnregistered,
           onMessage: _onUpMessage,
         );
@@ -352,16 +352,16 @@ class BackgroundPush {
         .registerAppWithDialog();
   }
 
-  Future<void> _newUpEndpoint(String newEndpoint, String i) async {
+  Future<void> _newUpEndpoint(PushEndpoint newEndpoint, String i) async {
     upAction = true;
-    if (newEndpoint.isEmpty) {
+    if (newEndpoint.url.isEmpty) {
       await _upUnregistered(i);
       return;
     }
     var endpoint =
         'https://matrix.gateway.unifiedpush.org/_matrix/push/v1/notify';
     try {
-      final url = Uri.parse(newEndpoint)
+      final url = Uri.parse(newEndpoint.url)
           .replace(
             path: '/_matrix/push/v1/notify',
             query: '',
@@ -389,11 +389,12 @@ class BackgroundPush {
     } catch (_) {}
     await setupPusher(
       gatewayUrl: endpoint,
-      token: newEndpoint,
+      token: newEndpoint.url,
       oldTokens: oldTokens,
       useDeviceSpecificAppId: true,
     );
-    await matrix?.store.setString(SettingKeys.unifiedPushEndpoint, newEndpoint);
+    await matrix?.store
+        .setString(SettingKeys.unifiedPushEndpoint, newEndpoint.url);
     await matrix?.store.setBool(SettingKeys.unifiedPushRegistered, true);
   }
 
@@ -412,10 +413,25 @@ class BackgroundPush {
     }
   }
 
-  Future<void> _onUpMessage(Uint8List message, String i) async {
+  Future<void> _upRegistrationFailed(FailedReason e, String i) async {
+    upAction = true;
+    Logs().i('[Push] Removing UnifiedPush endpoint...');
+    final oldEndpoint =
+        matrix?.store.getString(SettingKeys.unifiedPushEndpoint);
+    await matrix?.store.setBool(SettingKeys.unifiedPushRegistered, false);
+    await matrix?.store.remove(SettingKeys.unifiedPushEndpoint);
+    if (oldEndpoint?.isNotEmpty ?? false) {
+      // remove the old pusher
+      await setupPusher(
+        oldTokens: {oldEndpoint},
+      );
+    }
+  }
+
+  Future<void> _onUpMessage(PushMessage message, String i) async {
     upAction = true;
     final data = Map<String, dynamic>.from(
-      json.decode(utf8.decode(message))['notification'],
+      json.decode(utf8.decode(message.content))['notification'],
     );
     // UP may strip the devices list
     data['devices'] ??= [];

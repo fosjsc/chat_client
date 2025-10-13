@@ -128,6 +128,27 @@ abstract class AppConfig {
     password = password;
   }
 
+  Future<void> checkHomeServerAction(BuildContext context) async {
+    final homeServer = AppConfig.defaultHomeserver;
+    final homeServerInput = homeServer.toLowerCase().replaceAll(' ', '-');
+
+    try {
+      var homeServer = Uri.parse(homeServerInput);
+
+      if (homeServer.scheme.isEmpty) {
+        homeServer = Uri.https(homeServerInput, '');
+      }
+      final client = await Matrix.of(context).getLoginClient();
+      final (_, _, loginFlows) = await client.checkHomeserver(homeServer);
+
+      if (loginFlows.isEmpty) {
+        return;
+      }
+    } catch (e) {
+      print('CheckHomeServer Exception: $e');
+    }
+  }
+
   static Future<void> loginAction({
     required String username,
     required String password,

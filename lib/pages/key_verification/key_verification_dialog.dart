@@ -46,10 +46,18 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
       profile = p;
       setState(() {});
     });
-    rootBundle.loadString('assets/sas-emoji.json').then((e) {
-      sasEmoji = json.decode(e);
-      setState(() {});
-    });
+    try {
+      rootBundle
+          .loadString(
+        'packages/fluffychat/assets/sas-emoji.json',
+      )
+          .then((e) {
+        sasEmoji = json.decode(e);
+        setState(() {});
+      });
+    } catch (e) {
+      print("load sas-emoji.json failed: $e");
+    }
     super.initState();
   }
 

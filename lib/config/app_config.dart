@@ -15,6 +15,12 @@ abstract class AppConfig {
   static String _defaultHomeserver = 'chat.fosjsc.com';
   static String? username;
   static String? password;
+  static String? _fcmToken;
+  static String? _appIdFormParent;
+  static String? _gatewayNotifyUrl;
+  static String? get fcmToken => _fcmToken;
+  static String? get appIdFormParent => _appIdFormParent;
+  static String? get gatewayNotifyUrl => _gatewayNotifyUrl;
 
   static String get defaultHomeserver => _defaultHomeserver;
   static double fontSizeFactor = 1;
@@ -213,6 +219,16 @@ abstract class AppConfig {
     }
 
     return null; // Không tìm thấy user
+  }
+
+  static setInitDataPusher({
+    required String? fcmToken,
+    required String? appIdFromParent,
+    required String? gatewayNotifyUrl,
+  }) {
+    _fcmToken = fcmToken;
+    _appIdFormParent = appIdFromParent;
+    _gatewayNotifyUrl = gatewayNotifyUrl;
   }
 }
 

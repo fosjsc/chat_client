@@ -22,7 +22,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_new_badger/flutter_new_badger.dart';
@@ -51,7 +50,8 @@ class BackgroundPush {
       FlutterLocalNotificationsPlugin();
   Client client;
   MatrixState? matrix;
-  String? _fcmToken;
+  // String? _fcmToken;
+
   void Function(String errorMsg, {Uri? link})? onFcmError;
   L10n? l10n;
 
@@ -74,7 +74,7 @@ class BackgroundPush {
     try {
       await _flutterLocalNotificationsPlugin.initialize(
         const InitializationSettings(
-          android: AndroidInitializationSettings('notifications_icon'),
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
           iOS: DarwinInitializationSettings(),
         ),
         onDidReceiveNotificationResponse: goToRoom,
@@ -146,6 +146,7 @@ class BackgroundPush {
     String? token,
     Set<String?>? oldTokens,
     bool useDeviceSpecificAppId = false,
+    String? appIdFromParent,
   }) async {
     if (PlatformInfos.isIOS) {
       await firebase?.requestPermission();
@@ -165,7 +166,7 @@ class BackgroundPush {
         [];
     var setNewPusher = false;
     // Just the plain app id, we add the .data_message suffix later
-    var appId = AppConfig.pushNotificationsAppId;
+    var appId = appIdFromParent ?? AppConfig.pushNotificationsAppId;
     // we need the deviceAppId to remove potential legacy UP pusher
     var deviceAppId = '$appId.${client.deviceID}';
     // appId may only be up to 64 chars as per spec
@@ -282,44 +283,44 @@ class BackgroundPush {
     });
   }
 
-  Future<void> _noFcmWarning() async {
-    if (matrix == null) {
-      return;
-    }
-    if ((matrix?.store.getBool(SettingKeys.showNoGoogle) ?? false) == true) {
-      return;
-    }
-    await loadLocale();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (PlatformInfos.isAndroid) {
-        onFcmError?.call(
-          l10n!.noGoogleServicesWarning,
-          link: Uri.parse(
-            AppConfig.enablePushTutorial,
-          ),
-        );
-        return;
-      }
-      onFcmError?.call(l10n!.oopsPushError);
-    });
-  }
+  // Future<void> _noFcmWarning() async {
+  //   if (matrix == null) {
+  //     return;
+  //   }
+  //   if ((matrix?.store.getBool(SettingKeys.showNoGoogle) ?? false) == true) {
+  //     return;
+  //   }
+  //   await loadLocale();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (PlatformInfos.isAndroid) {
+  //       onFcmError?.call(
+  //         l10n!.noGoogleServicesWarning,
+  //         link: Uri.parse(
+  //           AppConfig.enablePushTutorial,
+  //         ),
+  //       );
+  //       return;
+  //     }
+  //     onFcmError?.call(l10n!.oopsPushError);
+  //   });
+  // }
 
   Future<void> setupFirebase() async {
     Logs().v('Setup firebase');
-    if (_fcmToken?.isEmpty ?? true) {
-      try {
-        _fcmToken = await firebase?.getToken();
-        if (_fcmToken == null) throw ('PushToken is null');
-      } catch (e, s) {
-        Logs().w('[Push] cannot get token', e, e is String ? null : s);
-        await _noFcmWarning();
-        return;
-      }
-    }
+    // if (_fcmToken?.isEmpty ?? true) {
+    //   try {
+    //     _fcmToken = await firebase?.getToken();
+    //     if (_fcmToken == null) throw ('PushToken is null');
+    //   } catch (e, s) {
+    //     Logs().w('[Push] cannot get token', e, e is String ? null : s);
+    //     await _noFcmWarning();
+    //     return;
+    //   }
+    // }
     await setupPusher(
-      gatewayUrl:
-          AppSettings.pushNotificationsGatewayUrl.getItem(matrix!.store),
-      token: _fcmToken,
+      gatewayUrl: AppConfig.gatewayNotifyUrl,
+      token: AppConfig.fcmToken,
+      appIdFromParent: AppConfig.appIdFormParent,
     );
   }
 

@@ -161,28 +161,34 @@ abstract class AppConfig {
     }
 
     try {
-      AuthenticationIdentifier identifier;
-      if (username.isEmail) {
-        identifier = AuthenticationThirdPartyIdentifier(
-          medium: 'email',
-          address: username,
-        );
+      final client = isClientLoggedIn(username, context);
+      if (client != null) {
+        matrix.setActiveClient(client);
       } else {
-        identifier = AuthenticationUserIdentifier(user: username);
-      }
-      final client = await matrix.getLoginClient();
+        AuthenticationIdentifier identifier;
+        if (username.isEmail) {
+          identifier = AuthenticationThirdPartyIdentifier(
+            medium: 'email',
+            address: username,
+          );
+        } else {
+          identifier = AuthenticationUserIdentifier(user: username);
+        }
 
-      await client.login(
-        LoginType.mLoginPassword,
-        identifier: identifier,
-        // To stay compatible with older server versions
-        // ignore: deprecated_member_use
-        user: identifier.type == AuthenticationIdentifierTypes.userId
-            ? username
-            : null,
-        password: password,
-        initialDeviceDisplayName: PlatformInfos.clientName,
-      );
+        final client = await matrix.getLoginClient();
+
+        await client.login(
+          LoginType.mLoginPassword,
+          identifier: identifier,
+          // To stay compatible with older server versions
+          // ignore: deprecated_member_use
+          user: identifier.type == AuthenticationIdentifierTypes.userId
+              ? username
+              : null,
+          password: password,
+          initialDeviceDisplayName: PlatformInfos.clientName,
+        );
+      }
     } on MatrixException catch (exception) {
       print('Auto Login MatrixException: ${exception.errorMessage}');
       return;
@@ -190,6 +196,23 @@ abstract class AppConfig {
       print('Auto Login Exception: $exception');
       return;
     }
+  }
+
+  static Client? isClientLoggedIn(String username, BuildContext context) {
+    final clients = Matrix.of(context).widget.clients;
+
+    for (final client in clients) {
+      if (client.userID == username ||
+          client.userID?.contains(username) == true) {
+        if (client.isLogged()) {
+          return client;
+        } else {
+          return null;
+        }
+      }
+    }
+
+    return null; // Không tìm thấy user
   }
 }
 

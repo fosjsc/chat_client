@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fluffychat/config/enum/chat_login_type.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -192,6 +193,42 @@ abstract class AppConfig {
               ? username
               : null,
           password: password,
+          initialDeviceDisplayName: PlatformInfos.clientName,
+        );
+      }
+    } on MatrixException catch (exception) {
+      print('Auto Login MatrixException: ${exception.errorMessage}');
+      return;
+    } catch (exception) {
+      print('Auto Login Exception: $exception');
+      return;
+    }
+  }
+
+  static Future<void> loginWithTokenAction({
+    required String token,
+    required String username,
+    required BuildContext context,
+  }) async {
+    final matrix = Matrix.of(context);
+
+    if (token.isEmpty) {
+      return;
+    }
+
+    try {
+      final client = isClientLoggedIn(username, context);
+      if (client != null) {
+        matrix.setActiveClient(client);
+      } else {
+        await checkHomeServerAction(context);
+        final client = await matrix.getLoginClient();
+
+        await client.login(
+          ChatLoginType.mLoginJWT,
+          // To stay compatible with older server versions
+          // ignore: deprecated_member_use
+          token: token,
           initialDeviceDisplayName: PlatformInfos.clientName,
         );
       }

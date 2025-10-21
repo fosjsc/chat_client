@@ -168,15 +168,15 @@ class UserDialog extends StatelessWidget {
           AdaptiveDialogAction(
             bigButtons: true,
             onPressed: () async {
-              final router = GoRouter.of(context);
-              Navigator.of(context).pop();
               final roomIdResult = await showFutureLoadingDialog(
                 context: context,
                 future: () => client.startDirectChat(profile.userId),
               );
+
               final roomId = roomIdResult.result;
               if (roomId == null) return;
-              router.go('/rooms/$roomId');
+              Navigator.of(context).pop();
+              GoRouter.of(context).go('/rooms/$roomId');
             },
             child: Text(
               dmRoomId == null

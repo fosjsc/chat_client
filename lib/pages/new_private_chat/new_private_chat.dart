@@ -52,17 +52,39 @@ class NewPrivateChatController extends State<NewPrivateChat> {
   }
 
   Future<List<Profile>> _searchUser(String searchTerm) async {
-    final result =
-        await Matrix.of(context).client.searchUserDirectory(searchTerm);
+    final client = Matrix.of(context).client;
+    final result = await client.searchUserDirectory(searchTerm);
     final profiles = result.results;
+
+    final homeServer = client.homeserver;
+    String? domain;
+    if (homeServer != null) {
+      domain = homeServer.hasPort
+          ? '${homeServer.host}:${homeServer.port}'
+          : homeServer.host;
+    }
 
     if (searchTerm.isValidMatrixId &&
         searchTerm.sigil == '@' &&
-        !profiles.any((profile) => profile.userId == searchTerm)) {
+        !profiles.any((profile) => profile.userId == searchTerm) &&
+        hasDomain(searchTerm, domain)) {
       profiles.add(Profile(userId: searchTerm));
     }
 
     return profiles;
+  }
+
+  bool hasDomain(String searchTerm, String? domain) {
+    // Cắt domain thực tế trong searchTerm (nếu có)
+    final match = RegExp(r'^@[^:]+:(.+)$').firstMatch(searchTerm);
+    final extractedDomain = match?.group(1);
+
+    if (extractedDomain == null || extractedDomain.isEmpty) {
+      return false; // Không có domain trong searchTerm
+    }
+
+    // So sánh domain (bỏ khoảng trắng, không phân biệt hoa thường)
+    return extractedDomain.trim().toLowerCase() == domain?.trim().toLowerCase();
   }
 
   void inviteAction() => FluffyShare.shareInviteLink(context);

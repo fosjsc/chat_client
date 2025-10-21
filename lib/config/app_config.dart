@@ -267,6 +267,15 @@ abstract class AppConfig {
     _appIdFormParent = appIdFromParent;
     _gatewayNotifyUrl = gatewayNotifyUrl;
   }
+
+  static logoutAction(BuildContext context) {
+    try {
+      Matrix.of(context).client.logout();
+    } catch (e) {
+      print('Logout Exception: $e');
+      return;
+    }
+  }
 }
 
 extension on String {

@@ -289,12 +289,19 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         InitWithRestoreExtension.deleteSessionBackup(name);
       }
       if (loggedInWithMultipleClients && state != LoginState.loggedIn) {
-        ScaffoldMessenger.of(
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
-              context,
-        ).showSnackBar(
+        final ctx =
+            FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
+                context;
+
+        if (!ctx.mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(ctx).showSnackBar(
           SnackBar(
-            content: Text(L10n.of(context).oneClientLoggedOut),
+            content: Text(
+              L10n.of(ctx).oneClientLoggedOut,
+            ),
           ),
         );
 

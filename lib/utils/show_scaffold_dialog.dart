@@ -14,6 +14,7 @@ Future<T?> showScaffoldDialog<T>({
     showDialog<T>(
       context: context,
       useSafeArea: false,
+      useRootNavigator: false,
       builder: FluffyThemes.isColumnMode(context)
           ? (context) => Center(
                 child: Container(

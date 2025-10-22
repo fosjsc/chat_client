@@ -16,6 +16,7 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 class KeyVerificationDialog extends StatefulWidget {
   Future<void> show(BuildContext context) => showAdaptiveDialog(
         context: context,
+        useRootNavigator: false,
         builder: (context) => this,
         barrierDismissible: false,
       );
@@ -94,7 +95,6 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
     );
     if (valid.error != null) {
       await showOkAlertDialog(
-        useRootNavigator: false,
         context: context,
         title: L10n.of(context).incorrectPassphraseOrKey,
       );

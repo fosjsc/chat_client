@@ -7,7 +7,6 @@ Future<T?> showModalActionPopup<T>({
   String? title,
   String? message,
   String? cancelLabel,
-  bool useRootNavigator = true,
 }) {
   final theme = Theme.of(context);
 
@@ -18,7 +17,6 @@ Future<T?> showModalActionPopup<T>({
     case TargetPlatform.linux:
       return showModalBottomSheet(
         isScrollControlled: true,
-        useRootNavigator: useRootNavigator,
         context: context,
         clipBehavior: Clip.hardEdge,
         constraints: BoxConstraints(
@@ -71,7 +69,7 @@ Future<T?> showModalActionPopup<T>({
     case TargetPlatform.macOS:
       return showCupertinoModalPopup<T>(
         context: context,
-        useRootNavigator: useRootNavigator,
+        useRootNavigator: false,
         builder: (context) => ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 512),
           child: CupertinoActionSheet(

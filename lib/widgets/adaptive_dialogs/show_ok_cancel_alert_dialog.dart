@@ -15,11 +15,10 @@ Future<OkCancelResult?> showOkCancelAlertDialog({
   String? okLabel,
   String? cancelLabel,
   bool isDestructive = false,
-  bool useRootNavigator = true,
 }) =>
     showAdaptiveDialog<OkCancelResult>(
       context: context,
-      useRootNavigator: useRootNavigator,
+      useRootNavigator: false,
       builder: (context) => AlertDialog.adaptive(
         title: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 256),
@@ -66,11 +65,10 @@ Future<OkCancelResult?> showOkAlertDialog({
   required String title,
   String? message,
   String? okLabel,
-  bool useRootNavigator = true,
 }) =>
     showAdaptiveDialog<OkCancelResult>(
       context: context,
-      useRootNavigator: useRootNavigator,
+      useRootNavigator: false,
       builder: (context) => AlertDialog.adaptive(
         title: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 256),

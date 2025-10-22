@@ -128,6 +128,7 @@ class ChatController extends State<ChatPageWithRoom>
 
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: details.files,
         room: room,
@@ -265,6 +266,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (files.isEmpty) return;
     showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: files,
         room: room,
@@ -593,6 +595,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (files.isEmpty) return;
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: files,
         room: room,
@@ -605,6 +608,7 @@ class ChatController extends State<ChatPageWithRoom>
     if (image == null) return;
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: [XFile.fromData(image)],
         room: room,
@@ -621,6 +625,7 @@ class ChatController extends State<ChatPageWithRoom>
 
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
@@ -640,6 +645,7 @@ class ChatController extends State<ChatPageWithRoom>
 
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
@@ -738,6 +744,7 @@ class ChatController extends State<ChatPageWithRoom>
   void sendLocationAction() async {
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (c) => SendLocationDialog(room: room),
     );
   }

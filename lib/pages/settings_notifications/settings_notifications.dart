@@ -102,6 +102,7 @@ class SettingsNotificationsController extends State<SettingsNotifications> {
     final theme = Theme.of(context);
     final action = await showAdaptiveDialog<PushRuleDialogAction>(
       context: context,
+      useRootNavigator: false,
       builder: (context) => ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 256),
         child: AlertDialog.adaptive(

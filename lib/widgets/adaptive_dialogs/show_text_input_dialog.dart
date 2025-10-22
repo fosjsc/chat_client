@@ -13,7 +13,6 @@ Future<String?> showTextInputDialog({
   String? message,
   String? okLabel,
   String? cancelLabel,
-  bool useRootNavigator = true,
   String? hintText,
   String? labelText,
   String? initialText,
@@ -31,7 +30,7 @@ Future<String?> showTextInputDialog({
   final controller = TextEditingController(text: initialText);
   return showAdaptiveDialog<String>(
     context: context,
-    useRootNavigator: useRootNavigator,
+    useRootNavigator: false,
     builder: (context) {
       final error = ValueNotifier<String?>(null);
       return ConstrainedBox(

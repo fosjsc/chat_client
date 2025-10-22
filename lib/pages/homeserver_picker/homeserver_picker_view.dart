@@ -166,6 +166,7 @@ class HomeserverPickerView extends StatelessWidget {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
+                                    useRootNavigator: false,
                                     builder: (context) => AlertDialog.adaptive(
                                       title: Text(
                                         L10n.of(context).whatIsAHomeserver,

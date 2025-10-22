@@ -18,6 +18,7 @@ class FluffyChatApp extends StatelessWidget {
   // final List<Client> clients;
   // final String? pincode;
   // final SharedPreferences store;
+  final Locale? locale;
 
   const FluffyChatApp({
     super.key,
@@ -25,6 +26,7 @@ class FluffyChatApp extends StatelessWidget {
     // required this.clients,
     // required this.store,
     // this.pincode,
+    this.locale,
   });
 
   /// getInitialLink may rereturn the value multiple times if this view is
@@ -32,10 +34,13 @@ class FluffyChatApp extends StatelessWidget {
   /// in with qr code or magic link.
   static bool gotInitialLink = false;
 
+  static final GlobalKey<NavigatorState> navigatorChatKey =
+      GlobalKey<NavigatorState>();
   // Router must be outside of build method so that hot reload does not reset
   // the current path.
   static final GoRouter router = GoRouter(
     routes: AppRoutes.routes,
+    navigatorKey: navigatorChatKey,
     debugLogDiagnostics: true,
   );
 
@@ -51,6 +56,7 @@ class FluffyChatApp extends StatelessWidget {
         scrollBehavior: CustomScrollBehavior(),
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
+        locale: locale,
         routerConfig: router,
         // builder: (context, child) => AppLockWidget(
         //   pincode: pincode,

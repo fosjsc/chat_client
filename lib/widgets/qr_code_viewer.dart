@@ -19,6 +19,7 @@ Future<void> showQrCodeViewer(
 ) =>
     showDialog(
       context: context,
+      useRootNavigator: false,
       builder: (context) => QrCodeViewer(content: content),
     );
 

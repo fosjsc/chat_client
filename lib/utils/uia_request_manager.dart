@@ -62,7 +62,6 @@ extension UiaRequestManager on MatrixState {
           );
           if (OkCancelResult.ok ==
               await showOkCancelAlertDialog(
-                useRootNavigator: false,
                 context: navigatorContext,
                 title: l10n.weSentYouAnEmail,
                 message: l10n.pleaseClickOnLink,
@@ -86,7 +85,6 @@ extension UiaRequestManager on MatrixState {
           launchUrlString(url.toString());
           if (OkCancelResult.ok ==
               await showOkCancelAlertDialog(
-                useRootNavigator: false,
                 title: l10n.pleaseFollowInstructionsOnWeb,
                 context: navigatorContext,
                 okLabel: l10n.next,

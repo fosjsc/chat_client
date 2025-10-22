@@ -101,6 +101,7 @@ class _SpaceViewState extends State<SpaceView> {
 
     final joined = await showAdaptiveDialog<bool>(
       context: context,
+      useRootNavigator: false,
       builder: (_) => PublicRoomDialog(
         chunk: item,
         via: space?.spaceChildren

@@ -13,6 +13,7 @@ Future<int?> showPermissionChooser(
   final error = ValueNotifier<String?>(null);
   return await showAdaptiveDialog<int>(
     context: context,
+    useRootNavigator: false,
     builder: (context) => AlertDialog.adaptive(
       title: Text(L10n.of(context).chatPermissions),
       content: ConstrainedBox(

@@ -122,6 +122,7 @@ class ChatListController extends State<ChatList>
       final matrixLocals = MatrixLocals(L10n.of(context));
       final action = await showAdaptiveDialog<InviteAction>(
         context: context,
+        useRootNavigator: false,
         builder: (context) => AlertDialog.adaptive(
           title: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 256),
@@ -260,7 +261,6 @@ class ChatListController extends State<ChatList>
 
   void setServer() async {
     final newServer = await showTextInputDialog(
-      useRootNavigator: false,
       title: L10n.of(context).changeTheHomeserver,
       context: context,
       okLabel: L10n.of(context).ok,
@@ -768,7 +768,6 @@ class ChatListController extends State<ChatList>
     final client = Matrix.of(context).client;
     final currentPresence = await client.fetchCurrentPresence(client.userID!);
     final input = await showTextInputDialog(
-      useRootNavigator: false,
       context: context,
       title: L10n.of(context).setStatus,
       message: L10n.of(context).leaveEmptyToClearStatus,

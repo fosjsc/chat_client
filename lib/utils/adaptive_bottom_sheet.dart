@@ -10,12 +10,11 @@ Future<T?> showAdaptiveBottomSheet<T>({
   required Widget Function(BuildContext) builder,
   bool isDismissible = true,
   bool isScrollControlled = true,
-  bool useRootNavigator = true,
 }) {
   if (FluffyThemes.isColumnMode(context)) {
     return showDialog<T>(
       context: context,
-      useRootNavigator: useRootNavigator,
+      useRootNavigator: false,
       barrierDismissible: isDismissible,
       useSafeArea: true,
       builder: (context) => Center(
@@ -50,7 +49,7 @@ Future<T?> showAdaptiveBottomSheet<T>({
         child: builder(context),
       ),
     ),
-    useRootNavigator: useRootNavigator,
+    useRootNavigator: false,
     isDismissible: isDismissible,
     isScrollControlled: isScrollControlled,
     constraints: BoxConstraints(

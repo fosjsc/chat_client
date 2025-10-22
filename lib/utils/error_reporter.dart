@@ -21,6 +21,7 @@ class ErrorReporter {
     final text = '$error\n${stackTrace ?? ''}';
     await showAdaptiveDialog(
       context: context,
+      useRootNavigator: false,
       builder: (context) => AlertDialog.adaptive(
         title: Text(L10n.of(context).reportErrorDescription),
         content: SizedBox(

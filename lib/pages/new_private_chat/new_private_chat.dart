@@ -66,25 +66,11 @@ class NewPrivateChatController extends State<NewPrivateChat> {
 
     if (searchTerm.isValidMatrixId &&
         searchTerm.sigil == '@' &&
-        !profiles.any((profile) => profile.userId == searchTerm) &&
-        hasDomain(searchTerm, domain)) {
+        !profiles.any((profile) => profile.userId == searchTerm)) {
       profiles.add(Profile(userId: searchTerm));
     }
 
     return profiles;
-  }
-
-  bool hasDomain(String searchTerm, String? domain) {
-    // Cắt domain thực tế trong searchTerm (nếu có)
-    final match = RegExp(r'^@[^:]+:(.+)$').firstMatch(searchTerm);
-    final extractedDomain = match?.group(1);
-
-    if (extractedDomain == null || extractedDomain.isEmpty) {
-      return false; // Không có domain trong searchTerm
-    }
-
-    // So sánh domain (bỏ khoảng trắng, không phân biệt hoa thường)
-    return extractedDomain.trim().toLowerCase() == domain?.trim().toLowerCase();
   }
 
   void inviteAction() => FluffyShare.shareInviteLink(context);
